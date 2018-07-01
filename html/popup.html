@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../css/popup.css" />
+    <script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="../js/chosen/chosen.jquery.min.js"></script>
+    <script type="text/javascript" src="../js/popup.js"></script>
+  </head>
+  <body>
+    <div id="jellySettings">
+
+      <div id="jellyActivationKeyBox" class="jellySettingBox">
+        <label id="jellyActivationKeyLabel" for="jellyActivationKey" class="jellySettingLabel">
+          Activation Key
+          <p class="jellyInfo">Ctrl+Alt+Key to activate</p>
+        </label>
+        <select id="jellyActivationKey" class="jellySetting jellySelectLetter jellySelect"></select>
+      </div>
+
+      <div id="jellyHighlightAnswerBox" class="jellySettingBox">
+        <label for="jellyHighlightAnswer" id="jellyHighlightAnswerLabel">Highlight Answer</label>
+        <input id="jellyHighlightAnswer" class="jellySetting" type="checkbox"/>
+      </div>
+
+      <div id="jellyPictureKeyBox" class="jellySettingBox">
+          <label for="jellyPictureKey" id="jellyPictureKeyLabel">
+            Picture terms
+            <p class="jellyInfo">Ctrl+Alt+Key to screen shot</p>
+          </label>
+          <select id="jellyPictureKey" class="jellySetting jellySelectLetter jellySelect"></select>
+      </div>
+
+      <div id="jellyAudioKeyBox" class="jellySettingBox">
+          <label for="jellyAudioKey" id="jellyAudioKeyLabel">
+            Audio terms
+            <p class="jellyInfo">Ctrl+Alt+Key to start/stop audio</p>
+          </label>
+          <select id="jellyAudioKey" class="jellySetting jellySelectLetter jellySelect"></select>
+      </div>
+
+      <div id="jellyCardProgramBox" class="jellySettingBox">
+          <label for="jellyCardProgram" id="jellyCardProgramLabel">
+            Flash card program
+          </label>
+          <select id="jellyCardProgram" class="jellySetting jellySelect">
+            <option value="mnemosyne">Mnemosyne</option>
+            <option value="quizlet">Quizlet</option>
+          </select>
+        </div>
+        
+        <div id="jellyCardInfoBox" class="jellyInfoBox">
+          <p class="jellyInfo">Flash card program to save to.</p>
+          <p class="jellyInfo">* = already set up.</p>
+      </div>
+    </div>
+
+
+    <datalist id="jellyActivationKeyList">
+      <!--<option value="A">
+      <option value="B">
+      <option value="C">
+      <option value="D">
+      <option value="E">
+      <option value="F">
+      <option value="G">
+      <option value="H">
+      <option value="I">
+      <option value="J">
+      <option value="K">
+      <option value="L">
+      <option value="M">
+      <option value="N">
+      <option value="O">
+      <option value="P">
+      <option value="Q">
+      <option value="R">
+      <option value="S">
+      <option value="T">
+      <option value="U">
+      <option value="V">
+      <option value="W">
+      <option value="X">
+      <option value="Y">
+      <option value="Z">-->
+
+    </datalist>
+  </body>
+</html>
