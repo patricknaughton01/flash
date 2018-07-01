@@ -19,6 +19,9 @@
     "default_popup": "html/popup.html"
   },
   "web_accessible_resources": [
-    "img/icon.png"
+    "img/icon.png",
+    "img/mnemosyne_logo.png",
+    "html/text-card-template.html",
+    "css/text-card-template.css"
   ]
 }
