@@ -14,7 +14,7 @@ document.onmouseup = async function(){
       icon.style.height = "18px";
       icon.style.left = x.toString() + "px";
       icon.style.top = y.toString() + "px";
-      icon.innerHTML = "<img src='" + chrome.extension.getURL('icon.png') + "' />";
+      icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
       document.getElementsByTagName("body")[0].appendChild(icon);
     }
   }
