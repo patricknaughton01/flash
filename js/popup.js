@@ -1,6 +1,6 @@
 $(function(){
   $options = `
-        <option value=None>Off</$option>
+        <option value=off>Off</$option>
         <option value="A">A</option>
         <option value="B">B</option>
         <option value="C">C</option>
@@ -28,4 +28,12 @@ $(function(){
         <option value="Y">Y</option>
         <option value="Z">Z</option>`;
   $(".jellySelectLetter").html($options);
+  chrome.runtime.sendMessage({"purpose":"settings", "key":null});
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    document.getElementById("jellyActivationKey").value = request.activationKey;
+    document.getElementById("jellyHighlightAnswer").checked = request.highlightAnswer;
+    document.getElementById("jellyPictureKey").value = request.pictureTerms;
+    document.getElementById("jellyAudioKey").value = request.audioTerms;
+    document.getElementById("jellyCardProgram").value = request.flashCardProgram;
+  });
 });
