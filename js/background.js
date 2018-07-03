@@ -12,6 +12,9 @@ if(settings == null){
   saveSettings();
 }
 
+/**
+ * Respond with requested settings
+ */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   if(request.purpose == "settings"){
     sendSettings(request.key);
