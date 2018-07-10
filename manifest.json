@@ -25,6 +25,7 @@
     "css/text-card-template.css"
   ],
   "permissions": [
-    "storage"
+    "storage",
+    "file://*/*"
   ]
 }

@@ -2,12 +2,12 @@ var settings;
 
 loadSettings();
 if(settings == null){
+  chrome.tabs.create({'url': "/html/options.html"});
   settings = {
     "activationKey": "off",
     "highlightAnswer": true,
     "pictureTerms": "off",
-    "audioTerms": "off",
-    "flashCardProgram": "none"
+    "audioTerms": "off"
   };
   saveSettings();
 }
