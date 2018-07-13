@@ -31,6 +31,9 @@ $(function(){
   $(".jellySetting").on("change", function(event){
     savePopupSettings();
   });
+  $("#jellySettingsButton").on("click", function(){
+    chrome.tabs.create({"url": "/html/options.html"});
+  });
   chrome.storage.sync.get(null, function(result){
     changeSelection("jellyActivationKey", result.activationKey);
     document.getElementById("jellyHighlightAnswer").checked = result.highlightAnswer;
