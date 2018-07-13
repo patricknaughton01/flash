@@ -34,6 +34,9 @@ function loadSettings(){
 }
 
 function sendSettings(key){
+  chrome.storage.sync.get(null, function(result){
+    settings = result;
+  });
   chrome.tabs.query({"active": true, "currentWindow": true}, function(tabs){
     var activeTab = tabs[0];
     if (key == null){
