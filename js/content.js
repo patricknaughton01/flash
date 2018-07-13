@@ -23,6 +23,21 @@ async function addCard(termText, x, y, xSize, ySize, element){
     $(".jellyNewTextCardContainer").load(
       chrome.extension.getURL('html/text-card-template.html')
     );
+    chrome.storage.sync.get("flashCardProgram", async function(response){
+      switch(response["flashCardProgram"]){
+        case "anki":
+          await sleep(2);
+          $(".jellyNewTextCard").load(chrome.extension.getURL('html/anki/text-fb-card.html'));
+          await sleep(2);
+          document.getElementById("jellyNewTextTermField").value = highlightedText;
+          document.getElementById("jellyNewTextAnswerField").focus();
+          break;
+        case "quizlet":
+          break;
+        default:
+          console.log("redirect to setup page");
+      }
+    });
   }
 }
 

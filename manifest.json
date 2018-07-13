@@ -22,7 +22,8 @@
     "img/icon.png",
     "img/Anki_logo.png",
     "html/text-card-template.html",
-    "css/text-card-template.css"
+    "css/text-card-template.css",
+    "html/anki/text-fb-card.html"
   ],
   "permissions": [
     "storage",
