@@ -20,13 +20,12 @@
   },
   "web_accessible_resources": [
     "img/icon.png",
-    "img/Anki_logo.png",
+    "img/anki_logo.jpg",
     "html/text-card-template.html",
     "css/text-card-template.css",
     "html/anki/text-fb-card.html"
   ],
   "permissions": [
-    "storage",
-    "file://*/*"
+    "storage"
   ]
 }

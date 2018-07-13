@@ -1,6 +1,7 @@
 var settings;
 
 loadSettings();
+await(5);
 if(settings == null){
   chrome.tabs.create({'url': "/html/options.html"});
   settings = {
@@ -29,7 +30,7 @@ function saveSettings(){
 
 function loadSettings(){
   chrome.storage.sync.get(null, function(data){
-    settings = data;
+      settings = data;
   });
 }
 

@@ -24,10 +24,16 @@ async function addCard(termText, x, y, xSize, ySize, element){
       chrome.extension.getURL('html/text-card-template.html')
     );
     chrome.storage.sync.get("flashCardProgram", async function(response){
+      // Fill in different fields based on the chosen flash card program
       switch(response["flashCardProgram"]){
         case "anki":
           await sleep(2);
-          $(".jellyNewTextCard").load(chrome.extension.getURL('html/anki/text-fb-card.html'));
+          var newCard = document.getElementById("jellyNewTextCard");
+          newCard.style.backgroundImage = "url(" + chrome.extension.getURL('img/anki_logo.jpg') + ")";
+          newCard.style.backgroundRepeat = "no-repeat";
+          newCard.style.backgroundSize = "100%";
+          await sleep(2);
+          $("#jellyNewTextCardDependent").load(chrome.extension.getURL('html/anki/text-fb-card.html'));
           await sleep(2);
           document.getElementById("jellyNewTextTermField").value = highlightedText;
           document.getElementById("jellyNewTextAnswerField").focus();

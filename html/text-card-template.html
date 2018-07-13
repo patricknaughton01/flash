@@ -1,13 +1,30 @@
 <div id="jellyNewTextCard" class="jellyNewTextCard">
+  <div id="jellyNewTextCardDependent">
 
+  </div>
+  <div id="jellyNewTextCardIndependent">
+    <input type="button" value="Donate!" id="jellyDonateButton" class="jellyCardButton"/>
+    <input type="button" value="Save" id="jellySaveButton" class="jellyCardButton"/>
+  </div>
 </div>
 
 <style>
   #jellyNewTextCard{
     min-width: 300px;
-    min-height: 400px;
     max-height: 500px;
     border: 1px solid black;
-    background-color: #c0c0c0;
+  }
+  #jellyNewTextCardIndependent{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+  }
+  .jellyCardButton{
+    width: 75px;
+    height: 30px;
+    margin: 20px;
+  }
+  #jellyNewTextCardIndependent{
+    background-color: rgba(0, 0, 255, 0.5);
   }
 </style>
