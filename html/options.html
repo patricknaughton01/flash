@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 </html>
   <head>
-
+    <link rel="stylesheet" href="../js/chosen/chosen.css"/>
+    <link rel="stylesheet" href="../css/bootstrap/css/bootstrap.min.css"/>
   </head>
   <body>
     <h1>Jelly</h1>
     <div id="jellyCardProgramSelectBox">
-      <div id="jellyMnemosyneBox">
-        <label for="jellyMnemosyneRadio" id="jellyMnemosyneRadioLabel">Mnemosyne</label>
-        <input id="jellyMnemosyneRadio" name="jellyCardProgram" value="mnemosyne" type="radio" />
+      <select id="jellyCardProgramSelect">
+        <option value="none">None</option>
+        <option value="anki">Anki</option>
+        <option value="quizlet">Quizlet</option>
+      </select>
+    </div>
+    <div id="jellyAnkiConfig" class="jellyConfigBox" style="display:none;">
+      <p class="jellyConfigInfo">
+        Make sure you install and set up <a class="jellyLink" href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a>! Otherwise you won't be able to save flash cards!
+      </p>
+      <div id="jellyAnkiConfigVersionBox" class="jellyAnkiConfigBox">
+        <label for="jellyAnkiConfigVersion" id="jellyAnkiConfigVersionLabel" class="jellyAnkiConfigLabel">Version: </label>
+        <input id="jellyAnkiConfigVersion" class="jellyAnkiConfigInput" type="number" />
       </div>
-      <div id="jellyQuizletBox">
-        <label for="jellyQuizletRadio" id="jellyQuizletRadioLabel">Quizlet</label>
-        <input id="jellyQuizletRadio" name="jellyCardProgram" value="quizlet" type="radio" />
+      <div id="jellyAnkiConfigVersionHelp" class="jellyConfigHelp">
+        <p>Remeber, this is the version of AnkiConnect, not Anki! As such, it should be a number from 1-6.</p>
+      </div>
+      <div id="jellyAnkiConfigAddressBox" class="jellyAnkiConfigBox">
+        <label for="jellyAnkiConfigAddress" class="jellyAnkiConfigAddressLabel">Bind Address:</label>
+        <input id="jellyAnkiConfigAddress" class="jellyAnkiConfigInput" type="text"/>
+      </div>
+      <div id="jellyAnkiConfigAddressHelp" class="jellyConfigHelp">
+        <p>If you don't know this, leave it blank. You will only be able to add cards from your computer. See <a class="jellyLink" href="https://foosoft.net/projects/anki-connect/#application-interface-for-developers">AnkiConnect's</a> website for more details.</p>
       </div>
     </div>
-    <div id="ankiConfig" style="display:none;">
-
-    </div>
-    <div id="quizletConfig" style="display:none;">
-
+    <div id="jellyQuizletConfig" class="jellyConfigBox" style="display:none;">
+      <p>I really should put something here</p>
     </div>
   </body>
+  <script src="../js/jquery-3.3.1.min.js"></script>
+  <script src="../js/chosen/chosen.jquery.min.js"></script>
   <script src="../js/options.js"></script>
 </html>
