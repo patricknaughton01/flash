@@ -21,8 +21,8 @@
   "web_accessible_resources": [
     "img/icon.png",
     "img/anki_logo.jpg",
-    "html/text-card-template.html",
-    "css/text-card-template.css",
+    "html/card-template.html",
+    "html/anki/config.html",
     "html/anki/text-fb-card.html"
   ],
   "permissions": [

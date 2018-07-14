@@ -11,8 +11,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     element.id = "jellyActiveIcon";
     window.getSelection().removeAllRanges();
     var container = document.createElement("div");
-    //container.id = "jellyNewTextCardContainer";
-    container.classList.add("jellyNewTextCardContainer");
+    container.classList.add("jellyNewCardContainer");
     container.style.position = "absolute";
     xOffset = xSize + 5;
     yOffset = ySize/2 - 100;
@@ -22,11 +21,11 @@ function addCard(termText, x, y, xSize, ySize, element){
     container.style.top = y.toString() + "px";
     document.getElementsByTagName("body")[0].appendChild(container);
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', chrome.runtime.getURL('html/text-card-template.html'));
+    xhr.open('GET', chrome.runtime.getURL('html/card-template.html'));
     xhr.onreadystatechange = function(){
       if(this.readyState !== 4)return;
       if(this.status !== 200)return;
-      document.getElementsByClassName("jellyNewTextCardContainer")[0].innerHTML = this.responseText;
+      document.getElementsByClassName("jellyNewCardContainer")[0].innerHTML = this.responseText;
       fillInCard();
     }
     xhr.send();
@@ -42,11 +41,39 @@ function fillInCard(){
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
       case "anki":
-        var newCard = document.getElementById("jellyNewTextCard");
+        var newCard = document.getElementById("jellyNewCard");
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/anki_logo.jpg') + ")";
         newCard.style.backgroundRepeat = "no-repeat";
         newCard.style.backgroundSize = "100%";
-        var xhr = new XMLHttpRequest();
+        chrome.storage.sync.get(["ankiVersion", "ankiAddress"], function(response){
+          if(response.ankiVersion === undefined || response.ankiAddress === undefined){
+            alert("You haven't set up Anki");
+            chrome.tabs.create({"url":"/html/options.html"});
+          }else{
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST',"http://" + response.ankiAddress.toString() + ":8765");
+            xhr.onreadystatechange = function(){
+              if(this.readyState !== 4)return;
+              if(this.status !== 200)return;
+              displayAnkiConfig(JSON.parse(this.responseText));
+            }
+            xhr.addEventListener("error", function(error){
+              console.log(error);
+              alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
+            });
+            xhr.send(JSON.stringify({
+              "action": "multi",
+              "version": response.ankiVersion,
+              "params": {
+                "actions": [
+                  {"action": "deckNames"},
+                  {"action": "modelNames"}
+                ]
+              }
+            }));
+          }
+        });
+        /*var xhr = new XMLHttpRequest();
         xhr.open('GET', chrome.runtime.getURL('html/anki/text-fb-card.html'));
         xhr.onreadystatechange = function(){
           if(this.readyState !== 4)return;
@@ -56,13 +83,37 @@ function fillInCard(){
           document.getElementById("jellyNewTextAnswerField").focus();
           //document.getElementById("jellySaveButton").onclick = saveCard();
         }
-        xhr.send();
+        xhr.send();*/
         break;
       case "quizlet":
         break;
       default:
         chrome.tabs.create({"url": "/html/options.html"});
     }
+  });
+}
+
+/**
+ * Display Anki Config info based on the user's anki account info
+ */
+function displayAnkiConfig(accountInfo){
+  var deckNames = accountInfo[0];
+  var modelNames = accountInfo[1];
+  chrome.storage.sync.get(["ankiDeck", "ankiModel"], function(response){
+    var deck;
+    var model;
+    if(response.ankiDeck === undefined || !deckNames.includes(response.ankiDeck)){
+      deck = deckNames[0];
+    }else{
+      deck = response.ankiDeck;
+    }
+    if(response.ankiModel === undefined || !modelNames.includes(response.ankiModel)){
+      model = modelNames[0];
+    }else{
+      model = response.ankiModel;
+    }
+    chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model}, function(){});
+    document.getElementById("jellyNewCardConfig").innerHTML = "<div id=\"jellyNewAnkiCardDeckBox\"><label for=\"jellyNewAnkiCardDeck\">Deck: </label><select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div><div id=\"jellyNewAnkiCardModelBox\"><label for=\"jellyNewAnkiCardModel\">Model: </label><select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div>";
   });
 }
 
@@ -91,7 +142,7 @@ document.onmouseup = function(){
 
   }else{
     clearClass("jellyIcon");
-    clearClass("jellyNewTextCardContainer");
+    clearClass("jellyNewCardContainer");
     cardExists = false;
     highlightedText = window.getSelection().toString();
     if(highlightedText != ""){
