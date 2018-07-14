@@ -1,6 +1,8 @@
 
 var highlightedText = "";
 var cardExists = false;
+var ankiAddress = "";
+var ankiVersion = "";
 
 /**
  * Add a card to the DOM at the icon location to create a card
@@ -44,46 +46,22 @@ function fillInCard(){
         var newCard = document.getElementById("jellyNewCard");
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/anki_logo.jpg') + ")";
         newCard.style.backgroundRepeat = "no-repeat";
-        newCard.style.backgroundSize = "100%";
+        newCard.style.backgroundSize = "cover";
         chrome.storage.sync.get(["ankiVersion", "ankiAddress"], function(response){
           if(response.ankiVersion === undefined || response.ankiAddress === undefined){
             alert("You haven't set up Anki");
             chrome.tabs.create({"url":"/html/options.html"});
           }else{
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST',"http://" + response.ankiAddress.toString() + ":8765");
-            xhr.onreadystatechange = function(){
-              if(this.readyState !== 4)return;
-              if(this.status !== 200)return;
-              displayAnkiConfig(JSON.parse(this.responseText));
-            }
-            xhr.addEventListener("error", function(error){
-              console.log(error);
-              alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
+            ankiAddress = response.ankiAddress;
+            ankiVersion = response.ankiVersion;
+            ankiRequest(displayAnkiConfig, "multi", {
+              "actions": [
+                {"action": "deckNames"},
+                {"action": "modelNames"}
+              ]
             });
-            xhr.send(JSON.stringify({
-              "action": "multi",
-              "version": response.ankiVersion,
-              "params": {
-                "actions": [
-                  {"action": "deckNames"},
-                  {"action": "modelNames"}
-                ]
-              }
-            }));
           }
         });
-        /*var xhr = new XMLHttpRequest();
-        xhr.open('GET', chrome.runtime.getURL('html/anki/text-fb-card.html'));
-        xhr.onreadystatechange = function(){
-          if(this.readyState !== 4)return;
-          if(this.status !== 200)return;
-          document.getElementById("jellyNewTextCardDependent").innerHTML = this.responseText;
-          document.getElementById("jellyNewTextTermField").value = highlightedText;
-          document.getElementById("jellyNewTextAnswerField").focus();
-          //document.getElementById("jellySaveButton").onclick = saveCard();
-        }
-        xhr.send();*/
         break;
       case "quizlet":
         break;
@@ -113,7 +91,67 @@ function displayAnkiConfig(accountInfo){
       model = response.ankiModel;
     }
     chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model}, function(){});
-    document.getElementById("jellyNewCardConfig").innerHTML = "<div id=\"jellyNewAnkiCardDeckBox\"><label for=\"jellyNewAnkiCardDeck\">Deck: </label><select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div><div id=\"jellyNewAnkiCardModelBox\"><label for=\"jellyNewAnkiCardModel\">Model: </label><select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div>";
+    document.getElementById("jellyNewCardConfig").innerHTML = "<div id=\"jellyNewAnkiCardDeckBox\"><label for=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfigLabel\">Deck: </label><select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div><div id=\"jellyNewAnkiCardModelBox\"><label for=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfigLabel\">Model: </label><select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div>";
+    var configLabels = document.getElementsByClassName("jellyNewAnkiCardConfigLabel");
+    for (var i =0; i<configLabels.length; i++){
+      configLabels[i].style.backgroundColor = "#ffffff";
+      configLabels[i].style.margin = "5px";
+    }
+    var deckSelect = document.getElementById("jellyNewAnkiCardDeck");
+    var modelSelect = document.getElementById("jellyNewAnkiCardModel");
+    deckSelect.innerHTML = generateOptionsList(deckNames);
+    modelSelect.innerHTML = generateOptionsList(modelNames);
+    changeSelection("jellyNewAnkiCardDeck", deck);
+    changeSelection("jellyNewAnkiCardModel", model);
+    deckSelect.onchange = saveAnkiCardConfig
+    modelSelect.onchange = ankiModelUpdate;
+    ankiModelUpdate();
+  });
+}
+
+/**
+ *  Put the fields of the card into the web page so they can be edited.
+ */
+function displayAnkiFields(fields){
+  var fieldString = "";
+  for(var i = 0; i<fields.length; i++){
+    fieldString += "<div id=\"jellyNewAnkiCardField" + fields[i] + "Box\" class=\"jellyNewAnkiCardFieldBox\">";
+    fieldString += "<label for=\"jellyNewAnkiCardField" + fields[i] + "\" class=\"jellyNewAnkiCardLabel\">" + fields[i] + ":</label><br/>"
+    fieldString += "<div id=\"jellyNewAnkiCardInputBox" + fields[i] + "\" class=\"jellyNewAnkiCardInputBox\">"
+    fieldString += "<textarea rows=\"2\" cols=\"20\" id=\"jellyNewAnkiCardField" + fields[i] + "\" class=\"jellyNewAnkiCardField\"></textarea>"
+    fieldString += "</div>"
+    fieldString += "</div>"
+  }
+  fieldString += `<style>
+    .jellyNewAnkiCardFieldBox{
+      margin:5px;
+    }
+    .jellyNewAnkiCardInputBox{
+      margin: 5px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    .jellyNewAnkiCardField{
+      width: 90%;
+      margin: auto;
+      display: block;
+      resize: none;
+    }
+    .jellyNewAnkiCardLabel{
+      background-color: #ffffff;
+    }
+  </style>`;
+  document.getElementById("jellyNewCardDependent").innerHTML = fieldString;
+  chrome.storage.sync.get("ankiHighlightPref", function(response){
+    var highlightIndex = response.ankiHighlightPref;
+    if(highlightIndex === undefined)highlightIndex = 0;
+    document.getElementsByClassName("jellyNewAnkiCardField")[highlightIndex].innerHTML = highlightedText;
+  });
+  chrome.storage.sync.get("ankiFocusPref", function(response){
+    var focusIndex = response.ankiFocusPref;
+    if(focusIndex === undefined)focusIndex = 1;
+    document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].focus();
   });
 }
 
@@ -125,7 +163,6 @@ document.onmouseup = function(){
   var y = event.pageY;
 
   var clickedElement = event.target;
-  console.log(clickedElement);
   var clickedIcon = elementClassContainsClick(["jellyIcon"], clickedElement);
   var clickedCard = elementClassContainsClick(["jellyNewCard"], clickedElement);
   if(clickedIcon != null){
@@ -208,3 +245,70 @@ function clearClass(className){
     }
   }catch(exception){}
 }
+
+/**
+ *  Make a request to the anki api
+ */
+function ankiRequest(callback, action, params={}){
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST',"http://" + ankiAddress.toString() + ":8765");
+  xhr.onreadystatechange = function(){
+    if(this.readyState !== 4)return;
+    if(this.status !== 200)return;
+    callback(JSON.parse(this.responseText));
+  }
+  xhr.addEventListener("error", function(error){
+    console.log(error);
+    alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
+  });
+  xhr.send(JSON.stringify({action, ankiVersion, params}));
+}
+
+/**
+ *  Create a string of options where each value and text element are the elements
+ *  of inputArr
+ */
+function generateOptionsList(inputArr){
+  var str = "";
+  for(var i in inputArr){
+    str += "<option value=\"" + inputArr[i] + "\">" + inputArr[i] + "</option>"
+  }
+  return str;
+}
+
+/**
+ *  Save the user's last used deck and/or model
+ */
+function saveAnkiCardConfig(){
+  var deck = document.getElementById("jellyNewAnkiCardDeck").value;
+  var model = document.getElementById("jellyNewAnkiCardModel").value;
+  chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model});
+}
+
+/**
+ *  Save the model preference and update the displayed fields based on the model
+ */
+function ankiModelUpdate(){
+  saveAnkiCardConfig();
+  ankiRequest(displayAnkiFields, "modelFieldNames", {"modelName": document.getElementById("jellyNewAnkiCardModel").value})
+}
+
+/**
+ * Change the selected value of the element identified by id `idName` to
+ * the value named by `targVal`
+ */
+ function changeSelection(idName, targVal){
+   var selElem = document.getElementById(idName);
+   if(selElem != null){
+     var opts = selElem.options;
+     for (var i = 0; i<opts.length; i++){
+       if (opts[i].value == targVal){
+         selElem.selectedIndex = i;
+         return true;
+       }
+     }
+     return false;
+   }else{
+     return false;
+   }
+ }
