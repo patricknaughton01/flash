@@ -47,6 +47,7 @@ function fillInCard(){
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/anki_logo.jpg') + ")";
         newCard.style.backgroundRepeat = "no-repeat";
         newCard.style.backgroundSize = "cover";
+        document.getElementById("jellySaveButton").onclick = saveAnkiCard;
         chrome.storage.sync.get(["ankiVersion", "ankiAddress"], function(response){
           if(response.ankiVersion === undefined || response.ankiAddress === undefined){
             alert("You haven't set up Anki");
@@ -156,6 +157,45 @@ function displayAnkiFields(fields){
 }
 
 /**
+ * Save the anki card to the database
+ */
+function saveAnkiCard(){
+  var fields = document.getElementsByClassName("jellyNewAnkiCardField");
+  var output = {};
+  for(var i = 0; i<fields.length; i++){
+    if(fields[i].value === ""){
+      alert("You must fill out all fields!");
+      return;
+    }else{
+      var fieldName = fields[i].getAttribute("id");
+      output[fieldName.slice(21)] = fields[i].value;
+    }
+  }
+  ankiRequest(ankiCardWrapUp, "addNote", {
+    "note": {
+      "deckName": document.getElementById("jellyNewAnkiCardDeck").value,
+      "modelName": document.getElementById("jellyNewAnkiCardModel").value,
+      "fields": output,
+      //"deckName": "Default",
+      //"modelName": "Basic",
+      //"fields":{
+      //  "Front": "test1",
+      //  "Back": "test2"
+      //},
+      "tags":[
+        "jelly"
+      ]
+    }
+  });
+}
+
+function ankiCardWrapUp(responseText){
+  console.log(responseText);
+  clearClass("jellyIcon");
+  clearClass("jellyNewCardContainer");
+}
+
+/**
  * Create image popup when user highlights text
  */
 document.onmouseup = function(){
@@ -252,11 +292,13 @@ function clearClass(className){
 function ankiRequest(callback, action, params={}){
   var xhr = new XMLHttpRequest();
   xhr.open('POST',"http://" + ankiAddress.toString() + ":8765");
-  xhr.onreadystatechange = function(){
+  //xhr.onreadystatechange = function(){
+  xhr.addEventListener("load", function(){
     if(this.readyState !== 4)return;
     if(this.status !== 200)return;
+    console.log(this.status);
     callback(JSON.parse(this.responseText));
-  }
+  });
   xhr.addEventListener("error", function(error){
     console.log(error);
     alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
