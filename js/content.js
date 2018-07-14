@@ -54,6 +54,7 @@ function fillInCard(){
           document.getElementById("jellyNewTextCardDependent").innerHTML = this.responseText;
           document.getElementById("jellyNewTextTermField").value = highlightedText;
           document.getElementById("jellyNewTextAnswerField").focus();
+          //document.getElementById("jellySaveButton").onclick = saveCard();
         }
         xhr.send();
         break;

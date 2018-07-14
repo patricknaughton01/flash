@@ -1,17 +1,6 @@
 var settings;
 
 loadSettings();
-await(5);
-if(settings == null){
-  chrome.tabs.create({'url': "/html/options.html"});
-  settings = {
-    "activationKey": "off",
-    "highlightAnswer": true,
-    "pictureTerms": "off",
-    "audioTerms": "off"
-  };
-  saveSettings();
-}
 
 /**
  * Respond with requested settings
@@ -31,6 +20,16 @@ function saveSettings(){
 function loadSettings(){
   chrome.storage.sync.get(null, function(data){
       settings = data;
+      if(settings == null){
+        chrome.tabs.create({'url': "/html/options.html"});
+        settings = {
+          "activationKey": "off",
+          "highlightAnswer": true,
+          "pictureTerms": "off",
+          "audioTerms": "off"
+        };
+        saveSettings();
+      }
   });
 }
 
