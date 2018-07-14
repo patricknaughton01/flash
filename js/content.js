@@ -5,12 +5,13 @@ var cardExists = false;
 /**
  * Add a card to the DOM at the icon location to create a card
  */
-async function addCard(termText, x, y, xSize, ySize, element){
+function addCard(termText, x, y, xSize, ySize, element){
   if (!cardExists){
     cardExists = true;
     element.id = "jellyActiveIcon";
     window.getSelection().removeAllRanges();
     var container = document.createElement("div");
+    //container.id = "jellyNewTextCardContainer";
     container.classList.add("jellyNewTextCardContainer");
     container.style.position = "absolute";
     xOffset = xSize + 5;
@@ -20,31 +21,48 @@ async function addCard(termText, x, y, xSize, ySize, element){
     container.style.left = x.toString() + "px";
     container.style.top = y.toString() + "px";
     document.getElementsByTagName("body")[0].appendChild(container);
-    $(".jellyNewTextCardContainer").load(
-      chrome.extension.getURL('html/text-card-template.html')
-    );
-    chrome.storage.sync.get("flashCardProgram", async function(response){
-      // Fill in different fields based on the chosen flash card program
-      switch(response["flashCardProgram"]){
-        case "anki":
-          await sleep(2);
-          var newCard = document.getElementById("jellyNewTextCard");
-          newCard.style.backgroundImage = "url(" + chrome.extension.getURL('img/anki_logo.jpg') + ")";
-          newCard.style.backgroundRepeat = "no-repeat";
-          newCard.style.backgroundSize = "100%";
-          await sleep(2);
-          $("#jellyNewTextCardDependent").load(chrome.extension.getURL('html/anki/text-fb-card.html'));
-          await sleep(2);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', chrome.runtime.getURL('html/text-card-template.html'));
+    xhr.onreadystatechange = function(){
+      if(this.readyState !== 4)return;
+      if(this.status !== 200)return;
+      document.getElementsByClassName("jellyNewTextCardContainer")[0].innerHTML = this.responseText;
+      fillInCard();
+    }
+    xhr.send();
+  }
+}
+
+/**
+ *  A function to fill in the detials of a card based on the program the user has
+ *  selected.
+ */
+function fillInCard(){
+  chrome.storage.sync.get("flashCardProgram", function(response){
+    // Fill in different fields based on the chosen flash card program
+    switch(response["flashCardProgram"]){
+      case "anki":
+        var newCard = document.getElementById("jellyNewTextCard");
+        newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/anki_logo.jpg') + ")";
+        newCard.style.backgroundRepeat = "no-repeat";
+        newCard.style.backgroundSize = "100%";
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', chrome.runtime.getURL('html/anki/text-fb-card.html'));
+        xhr.onreadystatechange = function(){
+          if(this.readyState !== 4)return;
+          if(this.status !== 200)return;
+          document.getElementById("jellyNewTextCardDependent").innerHTML = this.responseText;
           document.getElementById("jellyNewTextTermField").value = highlightedText;
           document.getElementById("jellyNewTextAnswerField").focus();
-          break;
-        case "quizlet":
-          break;
-        default:
-          console.log("redirect to setup page");
-      }
-    });
-  }
+        }
+        xhr.send();
+        break;
+      case "quizlet":
+        break;
+      default:
+        console.log("redirect to setup page");
+    }
+  });
 }
 
 /**
@@ -139,6 +157,17 @@ function clearClass(className){
       icons[i].parentNode.removeChild(icons[i]);
     }
   }catch(exception){}
+}
+
+/**
+ * Returns a promise to get a url so that chrome.extension.getURL effectively
+ * runs synchronously.
+ */
+function getURL(url){
+  return new Promise(function(resolve, reject){
+    resolve(chrome.extension.getURL(url));
+    reject("URL does not exist");
+  });
 }
 
 function sleep(ms){
