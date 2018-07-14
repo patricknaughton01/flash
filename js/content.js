@@ -61,7 +61,7 @@ function fillInCard(){
       case "quizlet":
         break;
       default:
-        console.log("redirect to setup page");
+        chrome.tabs.create({"url": "/html/options.html"});
     }
   });
 }
