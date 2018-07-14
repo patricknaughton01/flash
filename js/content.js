@@ -125,8 +125,9 @@ document.onmouseup = function(){
   var y = event.pageY;
 
   var clickedElement = event.target;
+  console.log(clickedElement);
   var clickedIcon = elementClassContainsClick(["jellyIcon"], clickedElement);
-  var clickedCard = elementClassContainsClick(["jellyNewTextCard"], clickedElement);
+  var clickedCard = elementClassContainsClick(["jellyNewCard"], clickedElement);
   if(clickedIcon != null){
     var cardLeftStart = parseInt(clickedIcon.style.left);
     var cardTopStart = parseInt(clickedIcon.style.top);
