@@ -68,7 +68,7 @@ function fillInCard(){
 /**
  * Create image popup when user highlights text
  */
-document.onmouseup = async function(){
+document.onmouseup = function(){
   var x = event.pageX;
   var y = event.pageY;
 
@@ -92,26 +92,23 @@ document.onmouseup = async function(){
     clearClass("jellyIcon");
     clearClass("jellyNewTextCardContainer");
     cardExists = false;
-    if(window.getSelection().toString() != ""){
+    highlightedText = window.getSelection().toString();
+    if(highlightedText != ""){
       var xOffset = -9;
       var yOffset = 10;
       var xSize = 18;
       var ySize = 18
       x += xOffset;
       y += yOffset;
-      await sleep(1);
-      highlightedText = window.getSelection().toString();
-      if(highlightedText != ""){
-        var icon = document.createElement("div");
-        icon.classList.add("jellyIcon");
-        icon.style.position = "absolute";
-        icon.style.width = xSize.toString() + "px";
-        icon.style.height = ySize.toString() + "px";
-        icon.style.left = x.toString() + "px";
-        icon.style.top = y.toString() + "px";
-        icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
-        document.getElementsByTagName("body")[0].appendChild(icon);
-      }
+      var icon = document.createElement("div");
+      icon.classList.add("jellyIcon");
+      icon.style.position = "absolute";
+      icon.style.width = xSize.toString() + "px";
+      icon.style.height = ySize.toString() + "px";
+      icon.style.left = x.toString() + "px";
+      icon.style.top = y.toString() + "px";
+      icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
+      document.getElementsByTagName("body")[0].appendChild(icon);
     }
   }
 
@@ -157,19 +154,4 @@ function clearClass(className){
       icons[i].parentNode.removeChild(icons[i]);
     }
   }catch(exception){}
-}
-
-/**
- * Returns a promise to get a url so that chrome.extension.getURL effectively
- * runs synchronously.
- */
-function getURL(url){
-  return new Promise(function(resolve, reject){
-    resolve(chrome.extension.getURL(url));
-    reject("URL does not exist");
-  });
-}
-
-function sleep(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
