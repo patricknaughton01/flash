@@ -3,6 +3,78 @@ var highlightedText = "";
 var cardExists = false;
 var ankiAddress = "";
 var ankiVersion = "";
+var ctrlDown = false;
+var altDown = false;
+
+var keyCallbacks = {
+  "activationKey": {"callbackDown": "", "callbackUp": ""},
+  "pictureTerms": {"callbackDown": "", "callbackUp": ""},
+  "audioTerms": {"callbackDown": "", "callbackUp": ""},
+  "visibilityToggle": {"callbackDown": "makeCardInvisible", "callbackUp": "makeCardVisible"}
+};
+
+/**
+ * Trigger keydown functions
+ */
+document.onkeydown = function(e){
+  switch(e.key){
+    case "Alt":
+      altDown = true;
+      break;
+    case "Control":
+      ctrlDown = true;
+      break;
+    default:
+      chrome.storage.sync.get(null, function(response){
+        for(var val in response){
+          var key = response[val].key;
+          if(key !== undefined && key === e.key && ctrlDown && altDown){
+            if(keyCallbacks[val]["callbackDown"] !== ""){
+              window[keyCallbacks[val]["callbackDown"]]();
+            }
+          }
+        }
+      });
+  }
+}
+
+document.onkeyup = function(e){
+  switch(e.key){
+    case "Alt":
+      altDown = false;
+      break;
+    case "Control":
+      ctrlDown = false;
+      break;
+    default:
+      chrome.storage.sync.get(null, function(response){
+        for(var val in response){
+          var key = response[val].key;
+          if(key !== undefined && key === e.key && ctrlDown && altDown){
+            if(keyCallbacks[val]["callbackUp"] !== ""){
+              window[keyCallbacks[val]["callbackUp"]]();
+            }
+          }
+        }
+      });
+  }
+}
+
+/**
+ * Make the flash card invisible (if it exists) to allow the user to see text
+ * they can highlight for the answer.
+ */
+function makeCardInvisible(){
+  console.log(document.getElementById("jellyNewCardcontainer"));
+  document.getElementById("jellyNewCardcontainer").style.display = "none";
+}
+
+/**
+ * Make the flash card visible (if it exists)
+ */
+function makeCardVisible(){
+  document.getElementById("jellyNewCardcontainer").style.display = "block";
+}
 
 /**
  * Add a card to the DOM at the icon location to create a card
@@ -14,6 +86,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     window.getSelection().removeAllRanges();
     var container = document.createElement("div");
     container.classList.add("jellyNewCardContainer");
+    container.id = "jellyNewCardcontainer";
     container.style.position = "absolute";
     xOffset = xSize + 5;
     yOffset = ySize/2 - 100;

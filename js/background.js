@@ -51,18 +51,22 @@ function saveSettings(){
 }
 
 function loadSettings(){
-  chrome.storage.sync.get(null, function(data){
-      settings = data;
-      if(settings == null){
-        chrome.tabs.create({'url': "/html/options.html"});
-        settings = {
-          "activationKey": "off",
-          "highlightAnswer": true,
-          "pictureTerms": "off",
-          "audioTerms": "off"
-        };
-        saveSettings();
-      }
+  chrome.storage.sync.getBytesInUse(null, function(bytes){
+    if(bytes === 0){
+      chrome.tabs.create({'url': "/html/options.html"});
+      settings = {
+        "activationKey": {"key": "off"},
+        "highlightAnswer": true,
+        "pictureTerms": {"key": "off"},
+        "audioTerms": {"key": "off"},
+        "visibilityToggle": {"key": "v"}
+      };
+      saveSettings();
+    }else{
+      chrome.storage.sync.get(null, function(data){
+        settings = data;
+      });
+    }
   });
 }
 
