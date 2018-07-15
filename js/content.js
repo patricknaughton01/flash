@@ -77,7 +77,6 @@ function fillInCard(){
  * Display Anki Config info based on the user's anki account info
  */
 function displayAnkiConfig(accountInfo){
-  console.log(accountInfo);
   var deckNames = accountInfo[0];
   var modelNames = accountInfo[1];
   chrome.storage.sync.get(["ankiDeck", "ankiModel"], function(response){
@@ -186,7 +185,6 @@ function saveAnkiCard(){
 }
 
 function ankiCardWrapUp(responseText){
-  console.log(responseText);
   clearClass("jellyIcon");
   clearClass("jellyNewCardContainer");
 }
@@ -286,28 +284,26 @@ function clearClass(className){
  *  Make a request to the anki api
  */
 function ankiRequest(callbackFunc, action, params={}){
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST',"http://" + ankiAddress.toString() + ":8765");
-  xhr.onreadystatechange = function(){
-    console.log(this.status);
-    if(this.readyState !== 4)return;
-    if(this.status !== 200)return;
-    var response = JSON.parse(this.responseText);
-    if(response.error !== null){
-      alert("Anki error: " + response.error);
+  chrome.runtime.sendMessage({
+    "purpose": "ankiRequest",
+    "callback": callbackFunc.name,
+    "address": ankiAddress,
+    "action": action,
+    "version": ankiVersion,
+    "params": params
+  });
+}
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+  if(request.type === "ankiResponse"){
+    if(request.error !== null){
+      console.log(request.error);
+      alert("Anki error: " + request.error);
     }else{
-      console.log("received success!");
-      callbackFunc(response.result);
+      window[request.callback](request.result);
     }
   }
-  xhr.addEventListener("error", function(error){
-    console.log(error);
-    alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
-  });
-  console.log(JSON.stringify({action, "version":ankiVersion, params}));
-  xhr.send(JSON.stringify({action, "version":ankiVersion, params}));
-  console.log("sent");
-}
+});
 
 /**
  *  Create a string of options where each value and text element are the elements
