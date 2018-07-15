@@ -176,12 +176,6 @@ function saveAnkiCard(){
       "deckName": document.getElementById("jellyNewAnkiCardDeck").value,
       "modelName": document.getElementById("jellyNewAnkiCardModel").value,
       "fields": output,
-      //"deckName": "Default",
-      //"modelName": "Basic",
-      //"fields":{
-      //  "Front": "test1",
-      //  "Back": "test2"
-      //},
       "tags":[
         "jelly"
       ]
@@ -292,7 +286,6 @@ function clearClass(className){
 function ankiRequest(callback, action, params={}){
   var xhr = new XMLHttpRequest();
   xhr.open('POST',"http://" + ankiAddress.toString() + ":8765");
-  //xhr.onreadystatechange = function(){
   xhr.addEventListener("load", function(){
     if(this.readyState !== 4)return;
     if(this.status !== 200)return;
