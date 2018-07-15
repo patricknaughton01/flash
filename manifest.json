@@ -26,6 +26,8 @@
     "html/anki/text-fb-card.html"
   ],
   "permissions": [
-    "storage"
+    "storage",
+    "http://*/*",
+    "activeTab"
   ]
 }
