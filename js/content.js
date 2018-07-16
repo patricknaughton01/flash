@@ -1,5 +1,6 @@
 
 var highlightedText = "";
+var highlightPos = [0, 0];
 var cardExists = false;
 var ankiAddress = "";
 var ankiVersion = "";
@@ -287,6 +288,7 @@ function closeCard(){
 document.onmouseup = function(){
   var x = event.pageX;
   var y = event.pageY;
+  highlightPos = [x, y];
 
   var clickedElement = event.target;
   var clickedIcon = elementClassContainsClick(["jellyIcon"], clickedElement);
@@ -308,7 +310,11 @@ document.onmouseup = function(){
     highlightedText = window.getSelection().toString();
     if(highlightedText != ""){
       if(!cardExists){
-        makeIcon(x, y);
+        chrome.storage.sync.get("activationKey", function(response){
+          if(response.activationKey.key === "off"){
+            makeIcon(x, y);
+          }
+        });
       }else{
         chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
           if(highlightStatus.highlightAnswer){
@@ -324,7 +330,11 @@ document.onmouseup = function(){
             });
           }else{
             closeCard();
-            makeIcon(x,y);
+            chrome.storage.sync.get("activationKey", function(response){
+              if(response.activationKey.key === "off"){
+                makeIcon(x, y);
+              }
+            });
           }
         });
       }
