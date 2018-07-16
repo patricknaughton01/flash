@@ -65,15 +65,20 @@ document.onkeyup = function(e){
  * they can highlight for the answer.
  */
 function makeCardInvisible(){
-  console.log(document.getElementById("jellyNewCardcontainer"));
-  document.getElementById("jellyNewCardcontainer").style.display = "none";
+  var cardContainer = document.getElementById("jellyNewCardcontainer");
+  if(cardContainer !== null){
+    cardContainer.style.display = "none";
+  }
 }
 
 /**
  * Make the flash card visible (if it exists)
  */
 function makeCardVisible(){
-  document.getElementById("jellyNewCardcontainer").style.display = "block";
+  var cardContainer = document.getElementById("jellyNewCardcontainer");
+  if(cardContainer !== null){
+    cardContainer.style.display = "block";
+  }
 }
 
 /**
@@ -221,7 +226,7 @@ function displayAnkiFields(fields){
   chrome.storage.sync.get("ankiHighlightPref", function(response){
     var highlightIndex = response.ankiHighlightPref;
     if(highlightIndex === undefined)highlightIndex = 0;
-    document.getElementsByClassName("jellyNewAnkiCardField")[highlightIndex].innerHTML = highlightedText;
+    document.getElementsByClassName("jellyNewAnkiCardField")[highlightIndex].innerText = highlightedText;
   });
   chrome.storage.sync.get("ankiFocusPref", function(response){
     var focusIndex = response.ankiFocusPref;
@@ -286,26 +291,36 @@ document.onmouseup = function(){
   }else if(clickedCard != null){
 
   }else{
-    clearClass("jellyIcon");
-    clearClass("jellyNewCardContainer");
-    cardExists = false;
     highlightedText = window.getSelection().toString();
     if(highlightedText != ""){
-      var xOffset = -9;
-      var yOffset = 10;
-      var xSize = 18;
-      var ySize = 18
-      x += xOffset;
-      y += yOffset;
-      var icon = document.createElement("div");
-      icon.classList.add("jellyIcon");
-      icon.style.position = "absolute";
-      icon.style.width = xSize.toString() + "px";
-      icon.style.height = ySize.toString() + "px";
-      icon.style.left = x.toString() + "px";
-      icon.style.top = y.toString() + "px";
-      icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
-      document.getElementsByTagName("body")[0].appendChild(icon);
+      if(!cardExists){
+        clearClass("jellyIcon");
+        var xOffset = -9;
+        var yOffset = 10;
+        var xSize = 18;
+        var ySize = 18
+        x += xOffset;
+        y += yOffset;
+        var icon = document.createElement("div");
+        icon.classList.add("jellyIcon");
+        icon.style.position = "absolute";
+        icon.style.width = xSize.toString() + "px";
+        icon.style.height = ySize.toString() + "px";
+        icon.style.left = x.toString() + "px";
+        icon.style.top = y.toString() + "px";
+        icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
+        document.getElementsByTagName("body")[0].appendChild(icon);
+      }else{
+        chrome.storage.sync.get("ankiFocusPref", function(response){
+          var focusIndex = response.ankiFocusPref;
+          if(focusIndex === undefined)focusIndex = 1;
+          document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
+        });
+      }
+    }else{
+      clearClass("jellyIcon");
+      clearClass("jellyNewCardContainer");
+      cardExists = false;
     }
   }
 
@@ -346,10 +361,11 @@ function hasOverlap(list1, list2){
  */
 function clearClass(className){
   try{
-    var icons = document.getElementsByClassName(className);
-    for(var i = 0; i < icons.length; i++){
-      icons[i].parentNode.removeChild(icons[i]);
-    }
+    do{
+      var icons = document.getElementsByClassName(className);
+      console.log(icons.length);
+      icons[0].parentNode.removeChild(icons[0]);
+    }while(icons.length > 0);
   }catch(exception){}
 }
 
