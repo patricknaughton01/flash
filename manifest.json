@@ -22,7 +22,7 @@
     "img/icon.png",
     "img/anki_logo.jpg",
     "html/card-template.html",
-    "html/anki/config.html",
+    "html/notification.html",
     "html/anki/text-fb-card.html"
   ],
   "permissions": [

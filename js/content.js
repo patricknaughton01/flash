@@ -270,6 +270,11 @@ function saveAnkiCard(){
 
 function ankiCardWrapUp(responseText){
   //TODO: Banner saying whether save was successful or not.
+  if(responseText !== null){
+    notify("success", "Card saved!", 5000);
+  }else{
+    notify("error", "Save failed :(", 5000);
+  }
   closeCard();
 }
 
@@ -498,6 +503,46 @@ function ankiModelUpdate(){
      return false;
    }
  }
+
+/**
+ * Create a notification banner in the top right of the screen that automatically
+ * disappears after `timeout` milliseconds
+ */
+function notify(type, message, timeout){
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", chrome.extension.getURL("html/notification.html"));
+  xhr.onreadystatechange = function(){
+    if(this.readyState !== 4)return;
+    if(this.status !== 200)return;
+    var notificationContainer = document.createElement("div");
+    notificationContainer.classList.add("jellyNotificationContainer");
+    notificationContainer.style.top = "10px";
+    notificationContainer.style.right = "10px";
+    notificationContainer.style.position = "fixed";
+    var color;
+    switch(type){
+      case "success":
+        color = "#66ff66";
+        break;
+      case "warning":
+        color = "#ffff66";
+        break;
+      case "error":
+        color = "#ff6666";
+        break;
+      default:
+    }
+    notificationContainer.style.backgroundColor = color;
+    document.getElementsByTagName("body")[0].appendChild(notificationContainer);
+    notificationContainer.innerHTML = this.responseText;
+    setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
+  }
+  xhr.send();
+}
+
+function destroyNotification(notification){
+  notification.parentNode.removeChild(notification);
+}
 
 function sleep(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
