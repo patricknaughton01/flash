@@ -8,7 +8,7 @@ var ctrlDown = false;
 var altDown = false;
 
 var keyCallbacks = {
-  "activationKey": {"callbackDown": "", "callbackUp": ""},
+  "activationKey": {"callbackDown": "", "callbackUp": "activateIcon"},
   "pictureTerms": {"callbackDown": "", "callbackUp": ""},
   "audioTerms": {"callbackDown": "", "callbackUp": ""},
   "visibilityToggle": {"callbackDown": "makeCardInvisible", "callbackUp": "makeCardVisible"}
@@ -285,7 +285,7 @@ function closeCard(){
 /**
  * Create image popup when user highlights text
  */
-document.onmouseup = function(){
+document.onmouseup = async function(){
   var x = event.pageX;
   var y = event.pageY;
   highlightPos = [x, y];
@@ -309,34 +309,40 @@ document.onmouseup = function(){
   }else{
     highlightedText = window.getSelection().toString();
     if(highlightedText != ""){
-      if(!cardExists){
-        chrome.storage.sync.get("activationKey", function(response){
-          if(response.activationKey.key === "off"){
-            makeIcon(x, y);
-          }
-        });
+      await sleep(1);
+      highlightedText = window.getSelection().toString();
+      if(highlightedText != ""){
+        if(!cardExists){
+          chrome.storage.sync.get("activationKey", function(response){
+            if(response.activationKey.key === "off"){
+              makeIcon(x, y);
+            }
+          });
+        }else{
+          chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
+            if(highlightStatus.highlightAnswer){
+              chrome.storage.sync.get("ankiFocusPref", function(response){
+                var focusIndex = response.ankiFocusPref;
+                if(focusIndex === undefined)focusIndex = 1;
+                try{
+                  document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
+                }catch(e){
+                  //TODO: change to Banner
+                  alert("It appears your focus index was out of range");
+                }
+              });
+            }else{
+              closeCard();
+              chrome.storage.sync.get("activationKey", function(response){
+                if(response.activationKey.key === "off"){
+                  makeIcon(x, y);
+                }
+              });
+            }
+          });
+        }
       }else{
-        chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
-          if(highlightStatus.highlightAnswer){
-            chrome.storage.sync.get("ankiFocusPref", function(response){
-              var focusIndex = response.ankiFocusPref;
-              if(focusIndex === undefined)focusIndex = 1;
-              try{
-                document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
-              }catch(e){
-                //TODO: change to Banner
-                alert("It appears your focus index was out of range");
-              }
-            });
-          }else{
-            closeCard();
-            chrome.storage.sync.get("activationKey", function(response){
-              if(response.activationKey.key === "off"){
-                makeIcon(x, y);
-              }
-            });
-          }
-        });
+        closeCard();
       }
     }else{
       closeCard();
@@ -369,25 +375,13 @@ function makeIcon(x, y){
 }
 
 /**
- * Create an icon at position x, y
+ * Create an icon at the last highlighted position if text is highlighted and
+ * the activation key is pressed.
  */
-function makeIcon(x, y){
-  clearClass("jellyIcon");
-  var xOffset = -9;
-  var yOffset = 10;
-  var xSize = 18;
-  var ySize = 18
-  x += xOffset;
-  y += yOffset;
-  var icon = document.createElement("div");
-  icon.classList.add("jellyIcon");
-  icon.style.position = "absolute";
-  icon.style.width = xSize.toString() + "px";
-  icon.style.height = ySize.toString() + "px";
-  icon.style.left = x.toString() + "px";
-  icon.style.top = y.toString() + "px";
-  icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
-  document.getElementsByTagName("body")[0].appendChild(icon);
+function activateIcon(){
+  if(highlightedText !== ""){
+    makeIcon(highlightPos[0], highlightPos[1]);
+  }
 }
 
 /**
@@ -504,3 +498,7 @@ function ankiModelUpdate(){
      return false;
    }
  }
+
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
