@@ -65,7 +65,7 @@ document.onkeyup = function(e){
  * they can highlight for the answer.
  */
 function makeCardInvisible(){
-  var cardContainer = document.getElementById("jellyNewCardcontainer");
+  var cardContainer = document.getElementById("jellyNewCardContainer");
   if(cardContainer !== null){
     cardContainer.style.display = "none";
   }
@@ -75,7 +75,7 @@ function makeCardInvisible(){
  * Make the flash card visible (if it exists)
  */
 function makeCardVisible(){
-  var cardContainer = document.getElementById("jellyNewCardcontainer");
+  var cardContainer = document.getElementById("jellyNewCardContainer");
   if(cardContainer !== null){
     cardContainer.style.display = "block";
   }
@@ -91,7 +91,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     window.getSelection().removeAllRanges();
     var container = document.createElement("div");
     container.classList.add("jellyNewCardContainer");
-    container.id = "jellyNewCardcontainer";
+    container.id = "jellyNewCardContainer";
     container.style.position = "absolute";
     xOffset = xSize + 5;
     yOffset = ySize/2 - 100;
@@ -231,7 +231,12 @@ function displayAnkiFields(fields){
   chrome.storage.sync.get("ankiFocusPref", function(response){
     var focusIndex = response.ankiFocusPref;
     if(focusIndex === undefined)focusIndex = 1;
-    document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].focus();
+    try{
+      document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].focus();
+    }catch(e){
+      // TODO: Make this a banner instead of an alert.
+      alert("It seems your focus field was out of range.");
+    }
   });
 }
 
@@ -263,6 +268,7 @@ function saveAnkiCard(){
 }
 
 function ankiCardWrapUp(responseText){
+  //TODO: Banner saying whether save was successful or not.
   clearClass("jellyIcon");
   clearClass("jellyNewCardContainer");
 }
@@ -311,10 +317,23 @@ document.onmouseup = function(){
         icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
         document.getElementsByTagName("body")[0].appendChild(icon);
       }else{
-        chrome.storage.sync.get("ankiFocusPref", function(response){
-          var focusIndex = response.ankiFocusPref;
-          if(focusIndex === undefined)focusIndex = 1;
-          document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
+        chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
+          if(highlightStatus.highlightAnswer){
+            chrome.storage.sync.get("ankiFocusPref", function(response){
+              var focusIndex = response.ankiFocusPref;
+              if(focusIndex === undefined)focusIndex = 1;
+              try{
+                document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
+              }catch(e){
+                //TODO: change to Banner
+                alert("It appears your focus index was out of range");
+              }
+            });
+          }else{
+            clearClass("jellyIcon");
+            clearClass("jellyNewCardContainer");
+            cardExists = false;
+          }
         });
       }
     }else{
@@ -363,7 +382,6 @@ function clearClass(className){
   try{
     do{
       var icons = document.getElementsByClassName(className);
-      console.log(icons.length);
       icons[0].parentNode.removeChild(icons[0]);
     }while(icons.length > 0);
   }catch(exception){}
