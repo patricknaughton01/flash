@@ -269,8 +269,16 @@ function saveAnkiCard(){
 
 function ankiCardWrapUp(responseText){
   //TODO: Banner saying whether save was successful or not.
+  closeCard();
+}
+
+/**
+ * Clear out any existing cards or icons
+ */
+function closeCard(){
   clearClass("jellyIcon");
   clearClass("jellyNewCardContainer");
+  cardExists = false;
 }
 
 /**
@@ -330,16 +338,12 @@ document.onmouseup = function(){
               }
             });
           }else{
-            clearClass("jellyIcon");
-            clearClass("jellyNewCardContainer");
-            cardExists = false;
+            closeCard();
           }
         });
       }
     }else{
-      clearClass("jellyIcon");
-      clearClass("jellyNewCardContainer");
-      cardExists = false;
+      closeCard();
     }
   }
 
