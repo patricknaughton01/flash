@@ -336,6 +336,9 @@ document.onmouseup = function(){
 
 }
 
+/**
+ * Create icon at (absolute) position x, y
+ */
 function makeIcon(x, y){
   clearClass("jellyIcon");
   var xOffset = -9;
