@@ -100,6 +100,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     y += yOffset;
     container.style.left = x.toString() + "px";
     container.style.top = y.toString() + "px";
+    container.style.zIndex = 1000000;
     document.getElementsByTagName("body")[0].appendChild(container);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', chrome.runtime.getURL('html/card-template.html'));
@@ -269,11 +270,10 @@ function saveAnkiCard(){
 }
 
 function ankiCardWrapUp(responseText){
-  //TODO: Banner saying whether save was successful or not.
   if(responseText !== null){
-    notify("success", "Card saved!", 5000);
+    notify("success", "Card saved!", 2000);
   }else{
-    notify("error", "Save failed :(", 5000);
+    notify("error", "Save failed :(", 2000);
   }
   closeCard();
 }
@@ -509,35 +509,52 @@ function ankiModelUpdate(){
  * disappears after `timeout` milliseconds
  */
 function notify(type, message, timeout){
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", chrome.extension.getURL("html/notification.html"));
-  xhr.onreadystatechange = function(){
-    if(this.readyState !== 4)return;
-    if(this.status !== 200)return;
-    var notificationContainer = document.createElement("div");
-    notificationContainer.classList.add("jellyNotificationContainer");
-    notificationContainer.style.top = "10px";
-    notificationContainer.style.right = "10px";
-    notificationContainer.style.position = "fixed";
-    var color;
-    switch(type){
-      case "success":
-        color = "#66ff66";
-        break;
-      case "warning":
-        color = "#ffff66";
-        break;
-      case "error":
-        color = "#ff6666";
-        break;
-      default:
-    }
-    notificationContainer.style.backgroundColor = color;
-    document.getElementsByTagName("body")[0].appendChild(notificationContainer);
-    notificationContainer.innerHTML = this.responseText;
-    setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
+  var notificationContainer = document.createElement("div");
+  notificationContainer.classList.add("jellyNotificationContainer");
+  notificationContainer.style.top = "10px";
+  notificationContainer.style.right = "10px";
+  notificationContainer.style.position = "fixed";
+  var color;
+  switch(type){
+    case "success":
+      color = "#66ff66";
+      break;
+    case "warning":
+      color = "#ffff66";
+      break;
+    case "error":
+      color = "#ff6666";
+      break;
+    default:
   }
-  xhr.send();
+  notificationContainer.style.backgroundColor = color;
+  notificationContainer.style.zIndex = 1000000;
+  document.getElementsByTagName("body")[0].appendChild(notificationContainer);
+  var notificationString = `<div class="jellyNotification">
+    <p class="jellyNotificationText">`;
+  notificationString += message;
+  notificationString += `</p>
+    </div>
+
+    <style>
+      .jellyNotification{
+        width:200px;
+        height:50px;
+        border: 4px solid rgba(32, 32, 32, 0.5);
+        display: flex;
+        flex-flow: row, wrap;
+        overflow: hidden;
+        flex-wrap:no-wrap;
+      }
+      .jellyNotificationText{
+        margin-top:auto;
+        margin-bottom:auto;
+        margin-left:3px;
+        padding:5px;
+      }
+    </style>`;
+  notificationContainer.innerHTML = notificationString;
+  setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
 }
 
 function destroyNotification(notification){
