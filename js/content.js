@@ -308,22 +308,7 @@ document.onmouseup = function(){
     highlightedText = window.getSelection().toString();
     if(highlightedText != ""){
       if(!cardExists){
-        clearClass("jellyIcon");
-        var xOffset = -9;
-        var yOffset = 10;
-        var xSize = 18;
-        var ySize = 18
-        x += xOffset;
-        y += yOffset;
-        var icon = document.createElement("div");
-        icon.classList.add("jellyIcon");
-        icon.style.position = "absolute";
-        icon.style.width = xSize.toString() + "px";
-        icon.style.height = ySize.toString() + "px";
-        icon.style.left = x.toString() + "px";
-        icon.style.top = y.toString() + "px";
-        icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
-        document.getElementsByTagName("body")[0].appendChild(icon);
+        makeIcon(x, y);
       }else{
         chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
           if(highlightStatus.highlightAnswer){
@@ -339,6 +324,7 @@ document.onmouseup = function(){
             });
           }else{
             closeCard();
+            makeIcon(x,y);
           }
         });
       }
@@ -348,6 +334,25 @@ document.onmouseup = function(){
   }
 
 
+}
+
+function makeIcon(x, y){
+  clearClass("jellyIcon");
+  var xOffset = -9;
+  var yOffset = 10;
+  var xSize = 18;
+  var ySize = 18
+  x += xOffset;
+  y += yOffset;
+  var icon = document.createElement("div");
+  icon.classList.add("jellyIcon");
+  icon.style.position = "absolute";
+  icon.style.width = xSize.toString() + "px";
+  icon.style.height = ySize.toString() + "px";
+  icon.style.left = x.toString() + "px";
+  icon.style.top = y.toString() + "px";
+  icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
+  document.getElementsByTagName("body")[0].appendChild(icon);
 }
 
 /**
