@@ -250,17 +250,19 @@ function displayFields(fields){
     }
   </style>`;
   document.getElementById("jellyNewCardDependent").innerHTML = fieldString;
+  var cardFields = document.getElementsByClassName("jellyNewCardField");
   chrome.storage.sync.get("highlightPref", function(response){
     var highlightIndex = response.highlightPref;
     if(highlightIndex === undefined)highlightIndex = 0;
-    document.getElementsByClassName("jellyNewCardField")[highlightIndex].innerText = highlightedText;
+    cardFields[highlightIndex].innerText = highlightedText;
   });
   chrome.storage.sync.get("focusPref", function(response){
     var focusIndex = response.focusPref;
     if(focusIndex === undefined)focusIndex = 1;
     try{
-      document.getElementsByClassName("jellyNewCardField")[focusIndex].focus();
+      cardFields[focusIndex].focus();
     }catch(e){
+      cardFields[cardFields.length-1].focus();
       // TODO: Make this a banner instead of an alert.
       alert("It seems your focus field was out of range.");
     }
@@ -344,9 +346,13 @@ function displayQuizletConfig(setInfo){
     setSelect.onchange = function(){
       chrome.storage.sync.set({"quizletSetId": document.getElementById("jellyNewQuizletCardSet").value}, function(){});
     };
+    displayFields(["Term", "Definition"]);
   });
 }
 
+function saveQuizletCard(){
+  
+}
 
 /**
  * Clear out any existing cards or icons
