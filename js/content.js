@@ -253,22 +253,31 @@ function displayFields(fields){
   </style>`;
   document.getElementById("jellyNewCardDependent").innerHTML = fieldString;
   var cardFields = document.getElementsByClassName("jellyNewCardField");
-  chrome.storage.sync.get("highlightPref", function(response){
-    var highlightIndex = response.highlightPref;
-    if(highlightIndex === undefined)highlightIndex = 0;
-    cardFields[highlightIndex].innerText = highlightedText;
-  });
-  chrome.storage.sync.get("focusPref", function(response){
-    var focusIndex = response.focusPref;
-    if(focusIndex === undefined)focusIndex = 1;
-    try{
-      cardFields[focusIndex].focus();
-    }catch(e){
-      cardFields[cardFields.length-1].focus();
-      // TODO: Make this a banner instead of an alert.
-      alert("It seems your focus field was out of range.");
-    }
-  });
+  if(cardFields.length > 0){
+    chrome.storage.sync.get("highlightPref", function(response){
+      var highlightIndex = response.highlightPref;
+      if(highlightIndex === undefined)highlightIndex = 0;
+      try{
+        cardFields[highlightIndex].innerText = highlightedText;
+      }catch(e){
+        cardFields[0].innerText = highlightedText;
+        notify("warning", "Highlight index" + highlightIndex + "out of range", 2000);
+      }
+    });
+    chrome.storage.sync.get("focusPref", function(response){
+      var focusIndex = response.focusPref;
+      if(focusIndex === undefined)focusIndex = 1;
+      try{
+        cardFields[focusIndex].focus();
+      }catch(e){
+        cardFields[cardFields.length-1].focus();
+        notify("warning", "Focus index " + focusIndex + " was out of range", 2000);
+      }
+    });
+  }else{
+    notify("error", "No new card fields?", 3000);
+    closeCard();
+  }
 }
 
 /**
@@ -300,7 +309,7 @@ function saveAnkiCard(){
 
 function ankiCardWrapUp(responseText){
   if(responseText !== null){
-    notify("success", "Card saved!", 2000);
+    notify("success", "Anki card saved!", 2000);
   }else{
     notify("error", "Save failed :(", 2000);
   }
@@ -370,7 +379,11 @@ function saveQuizletCard(){
 }
 
 function quizletCardWrapUp(response){
-  console.log(response);
+  if(response.id !== undefined){
+    notify("success", "Quizlet card saved!", 2000);
+  }else{
+    notify("error", "Save failed :(", 2000);
+  }
   closeCard();
 }
 
@@ -428,8 +441,7 @@ document.onmouseup = async function(){
                 try{
                   document.getElementsByClassName("jellyNewCardField")[focusIndex].innerText = highlightedText;
                 }catch(e){
-                  //TODO: change to Banner
-                  alert("It appears your focus index " + focusIndex + " was out of range");
+                  notify("warning", "Focus index " + focusIndex + " was out of range", 2000);
                 }
               });
             }else{
@@ -666,6 +678,7 @@ function notify(type, message, timeout){
         margin-bottom:auto;
         margin-left:3px;
         padding:5px;
+        font-size: 0.75em;
       }
     </style>`;
   notificationContainer.innerHTML = notificationString;
