@@ -94,6 +94,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     container.classList.add("jellyNewCardContainer");
     container.id = "jellyNewCardContainer";
     container.style.position = "absolute";
+    container.style.backgroundColor = "#ffffff";
     xOffset = xSize + 5;
     yOffset = ySize/2 - 100;
     x += xOffset;
@@ -120,18 +121,18 @@ function addCard(termText, x, y, xSize, ySize, element){
  */
 function fillInCard(){
   chrome.storage.sync.get("flashCardProgram", function(response){
+    var newCard = document.getElementById("jellyNewCard");
+    newCard.style.backgroundRepeat = "no-repeat";
+    newCard.style.backgroundSize = "cover";
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
       case "anki":
-        var newCard = document.getElementById("jellyNewCard");
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/anki_logo.jpg') + ")";
-        newCard.style.backgroundRepeat = "no-repeat";
-        newCard.style.backgroundSize = "cover";
         document.getElementById("jellySaveButton").onclick = saveAnkiCard;
         chrome.storage.sync.get(["ankiVersion", "ankiAddress"], function(response){
           if(response.ankiVersion === undefined || response.ankiAddress === undefined){
             alert("You haven't set up Anki");
-            chrome.tabs.create({"url":"/html/options.html"});
+            chrome.runtime.sendMessage({"purpose": "createTab", "url": "/html/options.html"});
           }else{
             ankiAddress = response.ankiAddress;
             ankiVersion = response.ankiVersion;
@@ -146,6 +147,20 @@ function fillInCard(){
         });
         break;
       case "quizlet":
+        newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/quizlet_logo.png') + ")";
+        chrome.storage.sync.get(["quizletAccessToken", "quizletUsername"], function(response){
+          if(response.quizletAccessToken === undefined || response.quizletUsername === undefined){
+            alert("You haven't set up Quizlet");
+            chrome.runtime.sendMessage({"purpose": "createTab", "url": "/html/options.html"});
+          }else{
+            quizletRequest(
+              displayQuizletConfig,
+              response.quizletAccessToken,
+              "GET",
+              "/users/" + response.quizletUsername + "/sets",
+            );
+          }
+        });
         break;
       default:
         chrome.tabs.create({"url": "/html/options.html"});
@@ -159,6 +174,16 @@ function fillInCard(){
 function displayAnkiConfig(accountInfo){
   var deckNames = accountInfo[0];
   var modelNames = accountInfo[1];
+  if(deckNames.length <= 0){
+    alert("You don't have any Anki decks! Make a deck before using Jelly!");
+    closeCard();
+    return;
+  }
+  if(modelNames.length <= 0){
+    alert("You don't have any Anki models! Make a model before using Jelly!");
+    closeCard();
+    return;
+  }
   chrome.storage.sync.get(["ankiDeck", "ankiModel"], function(response){
     var deck;
     var model;
@@ -277,6 +302,51 @@ function ankiCardWrapUp(responseText){
   }
   closeCard();
 }
+
+function displayQuizletConfig(setInfo){
+  var sets = [];
+  var setNames = [];
+  var setIds = [];
+  for(var i = 0; i < setInfo.length; i++){
+    var title = setInfo[i].title;
+    var id = setInfo[i].id;
+    sets.push({id: title});
+    setNames.push(title);
+    setIds.push(id);
+  }
+  if(sets.length <= 0){
+    alert("You don't have any Quizlet sets! Make a set before using Jelly!");
+    closeCard();
+    return;
+  }
+  chrome.storage.sync.get("quizletSetId", function(response){
+    var currSetId;
+    if(response.quizletSetId === undefined || !setIds.includes(response.quizletSetId)){
+      currSetId = setIds[0];
+    }else{
+      currSetId = response.quizletSetId;
+    }
+    chrome.storage.sync.set({"quizletSetId": currSetId});
+    document.getElementById("jellyNewCardConfig").innerHTML = (`
+      <div id=\"jellyNewQuizletCardDeckBox\">
+      <label for=\"jellyNewQuizletCardDeck\" class=\"jellyNewQuizletCardConfigLabel\">Set:
+      </label>
+      <select id=\"jellyNewQuizletCardSet\" class=\"jellyNewQuizletCardConfig jellyNewQuizletCardConfigSelect\">
+      </select>
+      </div>
+    `);
+    var configLabel = document.getElementsByClassName("jellyNewQuizletCardConfigLabel")[0];
+    configLabel.style.backgroundColor = "#ffffff";
+    configLabel.style.margin = "5px";
+    var setSelect = document.getElementById("jellyNewQuizletCardSet");
+    setSelect.innerHTML = generateOptionsList(setNames, setIds);
+    changeSelection("jellyNewQuizletCardSet", currSetId);
+    setSelect.onchange = function(){
+      chrome.storage.sync.set({"quizletSetId": document.getElementById("jellyNewQuizletCardSet").value}, function(){});
+    };
+  });
+}
+
 
 /**
  * Clear out any existing cards or icons
@@ -444,6 +514,17 @@ function ankiRequest(callbackFunc, action, params={}){
   });
 }
 
+function quizletRequest(callback, accessToken, method, endpoint, params={}){
+  chrome.runtime.sendMessage({
+    "purpose": "quizletRequest",
+    "callback": callback.name,
+    "access_token": accessToken,
+    "method": method,
+    "endpoint": endpoint,
+    "params": params
+  });
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   if(request.type === "ankiResponse"){
     if(request.error !== null){
@@ -452,6 +533,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     }else{
       window[request.callback](request.result);
     }
+  }else if(request.type === "quizletResponse"){
+    window[request.callback](request.response);
   }
 });
 
@@ -459,10 +542,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
  *  Create a string of options where each value and text element are the elements
  *  of inputArr
  */
-function generateOptionsList(inputArr){
+function generateOptionsList(inputArr, values=[]){
   var str = "";
-  for(var i in inputArr){
-    str += "<option value=\"" + inputArr[i] + "\">" + inputArr[i] + "</option>"
+  if(values.length === 0 || values.length !== inputArr.length){
+    for(var i in inputArr){
+      str += "<option value=\"" + inputArr[i] + "\">" + inputArr[i] + "</option>"
+    }
+  }else{
+    for(var i = 0; i<inputArr.length; i++){
+      str += "<option value=\"" + values[i] + "\">" + inputArr[i] + "</option>"
+    }
   }
   return str;
 }

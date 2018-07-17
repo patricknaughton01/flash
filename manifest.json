@@ -21,6 +21,7 @@
   "web_accessible_resources": [
     "img/icon.png",
     "img/anki_logo.jpg",
+    "img/quizlet_logo.png",
     "html/card-template.html",
     "html/notification.html",
     "html/anki/text-fb-card.html"

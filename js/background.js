@@ -14,6 +14,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     quizletAuth(request.url);
   }else if(request.purpose === "quizletGetAccessToken"){
     quizletGetAccessToken(request.key);
+  }else if(request.purpose === "quizletRequest"){
+    quizletRequest(request.callback, request.access_token, request.method, request.endpoint, request.params);
+  }else if(request.purpose === "createTab"){
+    try{
+      chrome.tabs.create({"url": request.url});
+    }catch(e){console.log(e);}
   }
 });
 
@@ -48,6 +54,30 @@ function sendAnkiResponse(response){
   });
 }
 
+function quizletRequest(callback, accessToken, method, endpoint, params={}){
+  var xhr = new XMLHttpRequest();
+  xhr.open(method, "https://api.quizlet.com/2.0" + endpoint);
+  xhr.onreadystatechange = function(){
+    if(this.readyState !== 4)return;
+    if(this.status !== 200)return;
+    var response = JSON.parse(this.responseText);
+    response.callback = callback;
+    sendQuizletResponse(response);
+  }
+  xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+  xhr.send(JSON.stringify(params));
+}
+
+function sendQuizletResponse(response){
+  chrome.tabs.query({"active": true, "currentWindow": true}, function(tabs){
+    chrome.tabs.sendMessage(tabs[0].id, {
+      "type": "quizletResponse",
+      "callback": response.callback,
+      "response": response
+    });
+  });
+}
+
 function quizletAuth(url){
   chrome.tabs.create({"url": url});
 }
@@ -57,13 +87,14 @@ function quizletGetAccessToken(key){
   xhr.open("POST", "https://api.quizlet.com/oauth/token/");
   xhr.onreadystatechange = function(){
     if(this.readyState!==4)return;
+    var response = JSON.parse(this.responseText);
     if(this.status!==200){
-      alert(JSON.parse(this.responseText).error_description);
+      alert(response.error_description);
       alert(":( Something went wrong when setting your access token. \
         See if you can reproduce this error and contact Patrick Naughton if so at patricknaughton01@gmail.com");
       return;
     }
-    chrome.storage.sync.set({"quizletAccessToken": JSON.parse(this.responseText).access_token}, function(){
+    chrome.storage.sync.set({"quizletAccessToken": response.access_token, "quizletUsername": response.user_id}, function(){
       alert("Your access token was successfully set! (even if the background says 'Cannot continue')");
     });
   }
