@@ -6,6 +6,7 @@ var ankiAddress = "";
 var ankiVersion = "";
 var ctrlDown = false;
 var altDown = false;
+var newCardIdBufferLen = 17;
 
 var keyCallbacks = {
   "activationKey": {"callbackDown": "", "callbackUp": "activateIcon"},
@@ -148,6 +149,7 @@ function fillInCard(){
         break;
       case "quizlet":
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/quizlet_logo.png') + ")";
+        document.getElementById("jellySaveButton").onclick = saveQuizletCard;
         chrome.storage.sync.get(["quizletAccessToken", "quizletUsername"], function(response){
           if(response.quizletAccessToken === undefined || response.quizletUsername === undefined){
             alert("You haven't set up Quizlet");
@@ -281,7 +283,7 @@ function saveAnkiCard(){
       return;
     }else{
       var fieldName = fields[i].getAttribute("id");
-      output[fieldName.slice(17)] = fields[i].value;
+      output[fieldName.slice(newCardIdBufferLen)] = fields[i].value;
     }
   }
   ankiRequest(ankiCardWrapUp, "addNote", {
@@ -351,7 +353,26 @@ function displayQuizletConfig(setInfo){
 }
 
 function saveQuizletCard(){
-  
+  var setId = document.getElementById("jellyNewQuizletCardSet").value.toString();
+  var output = {};
+  var cardFields = document.getElementsByClassName("jellyNewCardField");
+  for(var i = 0; i<cardFields.length; i++){
+    output[cardFields[i].getAttribute("id").slice(newCardIdBufferLen).toLowerCase()] = cardFields[i].value;
+  }
+  output["image"] = "";
+  chrome.storage.sync.get("quizletAccessToken", function(response){
+    if(response.quizletAccessToken === undefined){
+      alert("Quizlet not set up");
+      return;
+    }else{
+      quizletRequest(quizletCardWrapUp, response.quizletAccessToken, "POST", "/sets/" + setId + "/terms", output);
+    }
+  });
+}
+
+function quizletCardWrapUp(response){
+  console.log(response);
+  closeCard();
 }
 
 /**
@@ -406,10 +427,10 @@ document.onmouseup = async function(){
                 var focusIndex = response.ankiFocusPref;
                 if(focusIndex === undefined)focusIndex = 1;
                 try{
-                  document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].innerText = highlightedText;
+                  document.getElementsByClassName("jellyNewCardField")[focusIndex].innerText = highlightedText;
                 }catch(e){
                   //TODO: change to Banner
-                  alert("It appears your focus index was out of range");
+                  alert("It appears your focus index " + focusIndex + " was out of range");
                 }
               });
             }else{
