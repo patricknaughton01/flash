@@ -59,7 +59,7 @@ function quizletRequest(callback, accessToken, method, endpoint, params={}){
   xhr.open(method, "https://api.quizlet.com/2.0" + endpoint);
   xhr.onreadystatechange = function(){
     if(this.readyState !== 4)return;
-    if(this.status !== 200)alert(this.responseText);
+    if(this.status !== 200);
     var response = JSON.parse(this.responseText);
     response.callback = callback;
     sendQuizletResponse(response);

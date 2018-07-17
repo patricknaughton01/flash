@@ -359,7 +359,6 @@ function saveQuizletCard(){
   for(var i = 0; i<cardFields.length; i++){
     output[cardFields[i].getAttribute("id").slice(newCardIdBufferLen).toLowerCase()] = cardFields[i].value;
   }
-  output["image"] = "";
   chrome.storage.sync.get("quizletAccessToken", function(response){
     if(response.quizletAccessToken === undefined){
       alert("Quizlet not set up");
