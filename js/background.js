@@ -10,6 +10,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     sendSettings(request.key);
   }else if(request.purpose === "ankiRequest"){
     ankiRequest(request.callback, request.address, request.action, request.version, request.params);
+  }else if(request.purpose === "quizletAuth"){
+    quizletAuth(request.url);
+  }else if(request.purpose === "quizletGetAccessToken"){
+    quizletGetAccessToken(request.key);
   }
 });
 
@@ -42,6 +46,34 @@ function sendAnkiResponse(response){
       "error": response.error
     });
   });
+}
+
+function quizletAuth(url){
+  chrome.tabs.create({"url": url});
+}
+
+function quizletGetAccessToken(key){
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "https://api.quizlet.com/oauth/token/");
+  xhr.onreadystatechange = function(){
+    if(this.readyState!==4)return;
+    if(this.status!==200){
+      alert(JSON.parse(this.responseText).error_description);
+      alert(":( Something went wrong when setting your access token. \
+        See if you can reproduce this error and contact Patrick Naughton if so at patricknaughton01@gmail.com");
+      return;
+    }
+    chrome.storage.sync.set({"quizletAccessToken": JSON.parse(this.responseText).access_token}, function(){
+      alert("Your access token was successfully set! (even if the background says 'Cannot continue')");
+    });
+  }
+  xhr.setRequestHeader('Authorization', "Basic " + "SHQ0Tkgya3RYdjo2OVRIU0NNckMzeUdiVFNLeXZLeDhi");
+  xhr.setRequestHeader('Content-Type', "application/x-www-form-urlencoded; charset=UTF-8");
+  xhr.send(JSON.stringify({
+    "grant_type": "authorization_code",
+    "code": key,
+    "redirect_uri": "https://quizlet.com/authorize"
+  }));
 }
 
 function saveSettings(){
