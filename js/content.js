@@ -219,47 +219,47 @@ function displayAnkiConfig(accountInfo){
 /**
  *  Put the fields of the card into the web page so they can be edited.
  */
-function displayAnkiFields(fields){
+function displayFields(fields){
   var fieldString = "";
   for(var i = 0; i<fields.length; i++){
-    fieldString += "<div id=\"jellyNewAnkiCardField" + fields[i] + "Box\" class=\"jellyNewAnkiCardFieldBox\">";
-    fieldString += "<label for=\"jellyNewAnkiCardField" + fields[i] + "\" class=\"jellyNewAnkiCardLabel\">" + fields[i] + ":</label><br/>"
-    fieldString += "<div id=\"jellyNewAnkiCardInputBox" + fields[i] + "\" class=\"jellyNewAnkiCardInputBox\">"
-    fieldString += "<textarea rows=\"2\" cols=\"20\" id=\"jellyNewAnkiCardField" + fields[i] + "\" class=\"jellyNewAnkiCardField\"></textarea>"
+    fieldString += "<div id=\"jellyNewCardField" + fields[i] + "Box\" class=\"jellyNewCardFieldBox\">";
+    fieldString += "<label for=\"jellyNewCardField" + fields[i] + "\" class=\"jellyNewCardLabel\">" + fields[i] + ":</label><br/>"
+    fieldString += "<div id=\"jellyNewCardInputBox" + fields[i] + "\" class=\"jellyNewCardInputBox\">"
+    fieldString += "<textarea rows=\"2\" cols=\"20\" id=\"jellyNewCardField" + fields[i] + "\" class=\"jellyNewCardField\"></textarea>"
     fieldString += "</div>"
     fieldString += "</div>"
   }
   fieldString += `<style>
-    .jellyNewAnkiCardFieldBox{
+    .jellyNewCardFieldBox{
       margin:5px;
     }
-    .jellyNewAnkiCardInputBox{
+    .jellyNewCardInputBox{
       margin: 5px;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
     }
-    .jellyNewAnkiCardField{
+    .jellyNewCardField{
       width: 90%;
       margin: auto;
       display: block;
       resize: none;
     }
-    .jellyNewAnkiCardLabel{
+    .jellyNewCardLabel{
       background-color: #ffffff;
     }
   </style>`;
   document.getElementById("jellyNewCardDependent").innerHTML = fieldString;
-  chrome.storage.sync.get("ankiHighlightPref", function(response){
-    var highlightIndex = response.ankiHighlightPref;
+  chrome.storage.sync.get("highlightPref", function(response){
+    var highlightIndex = response.highlightPref;
     if(highlightIndex === undefined)highlightIndex = 0;
-    document.getElementsByClassName("jellyNewAnkiCardField")[highlightIndex].innerText = highlightedText;
+    document.getElementsByClassName("jellyNewCardField")[highlightIndex].innerText = highlightedText;
   });
-  chrome.storage.sync.get("ankiFocusPref", function(response){
-    var focusIndex = response.ankiFocusPref;
+  chrome.storage.sync.get("focusPref", function(response){
+    var focusIndex = response.focusPref;
     if(focusIndex === undefined)focusIndex = 1;
     try{
-      document.getElementsByClassName("jellyNewAnkiCardField")[focusIndex].focus();
+      document.getElementsByClassName("jellyNewCardField")[focusIndex].focus();
     }catch(e){
       // TODO: Make this a banner instead of an alert.
       alert("It seems your focus field was out of range.");
@@ -271,7 +271,7 @@ function displayAnkiFields(fields){
  * Save the anki card to the database
  */
 function saveAnkiCard(){
-  var fields = document.getElementsByClassName("jellyNewAnkiCardField");
+  var fields = document.getElementsByClassName("jellyNewCardField");
   var output = {};
   for(var i = 0; i<fields.length; i++){
     if(fields[i].value === ""){
@@ -279,7 +279,7 @@ function saveAnkiCard(){
       return;
     }else{
       var fieldName = fields[i].getAttribute("id");
-      output[fieldName.slice(21)] = fields[i].value;
+      output[fieldName.slice(17)] = fields[i].value;
     }
   }
   ankiRequest(ankiCardWrapUp, "addNote", {
@@ -570,7 +570,7 @@ function saveAnkiCardConfig(){
  */
 function ankiModelUpdate(){
   saveAnkiCardConfig();
-  ankiRequest(displayAnkiFields, "modelFieldNames", {"modelName": document.getElementById("jellyNewAnkiCardModel").value})
+  ankiRequest(displayFields, "modelFieldNames", {"modelName": document.getElementById("jellyNewAnkiCardModel").value})
 }
 
 /**
