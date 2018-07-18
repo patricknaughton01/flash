@@ -137,7 +137,6 @@ function fillInCard(){
           }else{
             ankiAddress = response.ankiAddress;
             ankiVersion = response.ankiVersion;
-            //ankiRequest(displayAnkiConfig, "deckNames");
             ankiRequest(displayAnkiConfig, "multi", {
               "actions": [
                 {"action": "deckNames"},
@@ -227,7 +226,9 @@ function displayAnkiConfig(accountInfo){
     }
 
     var newDeckButton = document.getElementById("jellyNewAnkiDeck");
-    newDeckButton.onclick = newAnkiDeck;
+    newDeckButton.onclick = function(){
+      newAnkiDeck(deckNames);
+    }
 
     var deckSelect = document.getElementById("jellyNewAnkiCardDeck");
     var modelSelect = document.getElementById("jellyNewAnkiCardModel");
@@ -339,10 +340,16 @@ function ankiCardWrapUp(responseText){
   closeCard();
 }
 
-function newAnkiDeck(){
-  var newDeckName = prompt("Please enter the name of the new deck");
+function newAnkiDeck(existingDecks){
+  var newDeckName = prompt("Please enter the name of the new deck").trim();
   if(newDeckName !== null){
-    ankiRequest(addNewDeckToActiveAnkiCard, "createDeck", {"deck": newDeckName});
+    if(!existingDecks.includes(newDeckName)){
+      chrome.storage.sync.set({"ankiDeck": newDeckName}, function(response){
+        ankiRequest(addNewDeckToActiveAnkiCard, "createDeck", {"deck": newDeckName});
+      });
+    }else{
+      notify("warning", "Deck already exists", 3000);
+    }
   }
 }
 
@@ -429,7 +436,7 @@ function quizletCardWrapUp(response){
 }
 
 function newQuizletSet(){
-  var newSetName = prompt("Please enter the name of the new set");
+  var newSetName = prompt("Please enter the name of the new set").trim();
   if(newSetName !== null){
     chrome.storage.sync.get("quizletAccessToken", function(response){
       if(response.quizletAccessToken !== undefined){
