@@ -421,10 +421,10 @@ document.onmouseup = async function(){
   }else if(clickedCard != null){
 
   }else{
-    highlightedText = window.getSelection().toString();
+    highlightedText = window.getSelection().toString().trim();
     if(highlightedText != ""){
       await sleep(1);
-      highlightedText = window.getSelection().toString();
+      highlightedText = window.getSelection().toString().trim();
       if(highlightedText != ""){
         if(!cardExists){
           chrome.storage.sync.get("activationKey", function(response){
@@ -567,7 +567,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   if(request.type === "ankiResponse"){
     if(request.error !== null){
       console.log(request.error);
-      alert("Anki error: " + request.error);
+      notify("error", request.error.charAt(0).toUpperCase() + request.error.slice(1), 5000);
+      closeCard();
     }else{
       window[request.callback](request.result);
     }
@@ -665,7 +666,7 @@ function notify(type, message, timeout){
 
     <style>
       .jellyNotification{
-        width:200px;
+        width:300px;
         height:50px;
         border: 4px solid rgba(32, 32, 32, 0.5);
         display: flex;
@@ -673,12 +674,16 @@ function notify(type, message, timeout){
         overflow: hidden;
         flex-wrap:no-wrap;
       }
+      .jellyNotificationContainer:hover{
+        opacity: 0.2;
+      }
       .jellyNotificationText{
         margin-top:auto;
         margin-bottom:auto;
         margin-left:3px;
         padding:5px;
         font-size: 0.75em;
+        whitespace: nowrap;
       }
     </style>`;
   notificationContainer.innerHTML = notificationString;
