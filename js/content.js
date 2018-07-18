@@ -200,12 +200,35 @@ function displayAnkiConfig(accountInfo){
       model = response.ankiModel;
     }
     chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model}, function(){});
-    document.getElementById("jellyNewCardConfig").innerHTML = "<div id=\"jellyNewAnkiCardDeckBox\"><label for=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfigLabel\">Deck: </label><select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div><div id=\"jellyNewAnkiCardModelBox\"><label for=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfigLabel\">Model: </label><select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\"></select></div>";
+    document.getElementById("jellyNewCardConfig").innerHTML = (`
+      <div id=\"jellyNewAnkiCardDeckBox\">
+        <label for=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfigLabel\">
+          Deck:
+        </label>
+        <select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\">
+        </select>
+      </div>
+      <div id=\"jellyNewAnkiDeckBox\">
+        <button id="jellyNewAnkiDeck" class="jellyNewAnkiCardConfig">
+          New Deck
+        </button>
+      </div>
+      <div id=\"jellyNewAnkiCardModelBox\">
+        <label for=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfigLabel\">
+          Model:
+        </label>
+        <select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\">
+        </select>
+      </div>`);
     var configLabels = document.getElementsByClassName("jellyNewAnkiCardConfigLabel");
     for (var i =0; i<configLabels.length; i++){
       configLabels[i].style.backgroundColor = "#ffffff";
       configLabels[i].style.margin = "5px";
     }
+
+    var newDeckButton = document.getElementById("jellyNewAnkiDeck");
+    newDeckButton.onclick = newAnkiDeck;
+
     var deckSelect = document.getElementById("jellyNewAnkiCardDeck");
     var modelSelect = document.getElementById("jellyNewAnkiCardModel");
     deckSelect.innerHTML = generateOptionsList(deckNames);
@@ -314,6 +337,23 @@ function ankiCardWrapUp(responseText){
     notify("error", "Save failed :(", 2000);
   }
   closeCard();
+}
+
+function newAnkiDeck(){
+  var newDeckName = prompt("Please enter the name of the new deck");
+  if(newDeckName !== null){
+    ankiRequest(addNewDeckToActiveAnkiCard, "createDeck", {"deck": newDeckName});
+  }
+}
+
+function addNewDeckToActiveAnkiCard(response){
+  notify("success", "Added new deck", 2000);
+  ankiRequest(displayAnkiConfig, "multi", {
+    "actions": [
+      {"action": "deckNames"},
+      {"action": "modelNames"}
+    ]
+  });
 }
 
 function displayQuizletConfig(setInfo){
