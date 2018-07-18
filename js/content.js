@@ -125,6 +125,7 @@ function fillInCard(){
     var newCard = document.getElementById("jellyNewCard");
     newCard.style.backgroundRepeat = "no-repeat";
     newCard.style.backgroundSize = "cover";
+    document.getElementById("jellyLoadingIcon").src = chrome.extension.getURL("img/loading.gif");
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
       case "anki":
@@ -274,7 +275,9 @@ function displayFields(fields){
       background-color: #ffffff;
     }
   </style>`;
-  document.getElementById("jellyNewCardDependent").innerHTML = fieldString;
+  var dependentDiv = document.getElementById("jellyNewCardDependent");
+  dependentDiv.style.display = "block";
+  dependentDiv.innerHTML = fieldString;
   var cardFields = document.getElementsByClassName("jellyNewCardField");
   if(cardFields.length > 0){
     chrome.storage.sync.get("highlightPref", function(response){
