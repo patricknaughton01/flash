@@ -348,12 +348,7 @@ function newAnkiDeck(){
 
 function addNewDeckToActiveAnkiCard(response){
   notify("success", "Added new deck", 2000);
-  ankiRequest(displayAnkiConfig, "multi", {
-    "actions": [
-      {"action": "deckNames"},
-      {"action": "modelNames"}
-    ]
-  });
+  fillInCard();
 }
 
 function displayQuizletConfig(setInfo){
@@ -387,7 +382,13 @@ function displayQuizletConfig(setInfo){
       <select id=\"jellyNewQuizletCardSet\" class=\"jellyNewQuizletCardConfig jellyNewQuizletCardConfigSelect\">
       </select>
       </div>
+      <div id="jellyNewQuizletSetBox">
+        <button id="jellyNewQuizletSet" class="jellyNewQuizletCardConfig">New Set</button>
+      </div>
     `);
+
+    document.getElementById("jellyNewQuizletSet").onclick = newQuizletSet;
+
     var configLabel = document.getElementsByClassName("jellyNewQuizletCardConfigLabel")[0];
     configLabel.style.backgroundColor = "#ffffff";
     configLabel.style.margin = "5px";
@@ -425,6 +426,40 @@ function quizletCardWrapUp(response){
     notify("error", "Save failed :(", 2000);
   }
   closeCard();
+}
+
+function newQuizletSet(){
+  var newSetName = prompt("Please enter the name of the new set");
+  if(newSetName !== null){
+    chrome.storage.sync.get("quizletAccessToken", function(response){
+      if(response.quizletAccessToken !== undefined){
+        quizletRequest(
+          addNewSetToActiveQuizletCard,
+          response.quizletAccessToken,
+          "POST",
+          "/sets",
+          {
+            "title": newSetName,
+            "terms": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
+            "definitions": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
+            "lang_terms": "en",
+            "lang_definitions": "en"
+          }
+        );
+      }else{
+        alert("You haven't set up Quizlet!");
+        closeCard();
+        return;
+      }
+    });
+  }
+}
+
+function addNewSetToActiveQuizletCard(response){
+  chrome.storage.sync.set({"quizletSetId": response.set_id}, function(response){
+    notify("success", "Added new set", 2000);
+    fillInCard();
+  });
 }
 
 /**
