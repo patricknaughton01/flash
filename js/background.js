@@ -59,11 +59,14 @@ function quizletRequest(callback, accessToken, method, endpoint, params={}){
   xhr.open(method, "https://api.quizlet.com/2.0" + endpoint);
   xhr.onreadystatechange = function(){
     if(this.readyState !== 4)return;
-    if(this.status !== 200 && this.status !== 201){
+    if(this.status !== 200 && this.status !== 201 && this.status !== 204){
       alert("Quizlet experienced an error: " + JSON.parse(this.responseText).error_description);
       return;
     }
-    var response = JSON.parse(this.responseText);
+    var response = {};
+    try{
+      var response = JSON.parse(this.responseText);
+    }catch(e){}
     response.callback = callback;
     sendQuizletResponse(response);
   }

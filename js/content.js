@@ -149,14 +149,13 @@ function fillInCard(){
       case "quizlet":
         newCard.style.backgroundImage = "url(" + chrome.runtime.getURL('img/quizlet_logo.png') + ")";
         document.getElementById("jellySaveButton").onclick = saveQuizletCard;
-        chrome.storage.sync.get(["quizletAccessToken", "quizletUsername"], function(response){
-          if(response.quizletAccessToken === undefined || response.quizletUsername === undefined){
+        chrome.storage.sync.get("quizletUsername", function(response){
+          if(response.quizletUsername === undefined){
             alert("You haven't set up Quizlet");
             chrome.runtime.sendMessage({"purpose": "createTab", "url": "/html/options.html"});
           }else{
             quizletRequest(
               displayQuizletConfig,
-              response.quizletAccessToken,
               "GET",
               "/users/" + response.quizletUsername + "/sets",
             );
@@ -416,14 +415,10 @@ function saveQuizletCard(){
   for(var i = 0; i<cardFields.length; i++){
     output[cardFields[i].getAttribute("id").slice(newCardIdBufferLen).toLowerCase()] = cardFields[i].value;
   }
-  chrome.storage.sync.get("quizletAccessToken", function(response){
-    if(response.quizletAccessToken === undefined){
-      alert("Quizlet not set up");
-      return;
-    }else{
-      quizletRequest(quizletCardWrapUp, response.quizletAccessToken, "POST", "/sets/" + setId + "/terms", output);
-    }
-  });
+  quizletRequest(quizletCardWrapUp, "POST", "/sets/" + setId + "/terms", output);
+  setTimeout(function(){
+    tryToDeleteQuizletSentinels(setId);
+  }, 3000);
 }
 
 function quizletCardWrapUp(response){
@@ -438,27 +433,18 @@ function quizletCardWrapUp(response){
 function newQuizletSet(){
   var newSetName = prompt("Please enter the name of the new set").trim();
   if(newSetName !== null){
-    chrome.storage.sync.get("quizletAccessToken", function(response){
-      if(response.quizletAccessToken !== undefined){
-        quizletRequest(
-          addNewSetToActiveQuizletCard,
-          response.quizletAccessToken,
-          "POST",
-          "/sets",
-          {
-            "title": newSetName,
-            "terms": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
-            "definitions": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
-            "lang_terms": "en",
-            "lang_definitions": "en"
-          }
-        );
-      }else{
-        alert("You haven't set up Quizlet!");
-        closeCard();
-        return;
+    quizletRequest(
+      addNewSetToActiveQuizletCard,
+      "POST",
+      "/sets",
+      {
+        "title": newSetName,
+        "terms": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
+        "definitions": ["jellySentinel!@#$%^&*()", "jellySentinel)(*&^%$#@!"],
+        "lang_terms": "en",
+        "lang_definitions": "en"
       }
-    });
+    );
   }
 }
 
@@ -467,6 +453,29 @@ function addNewSetToActiveQuizletCard(response){
     notify("success", "Added new set", 2000);
     fillInCard();
   });
+}
+
+function tryToDeleteQuizletSentinels(setId){
+  quizletRequest(deleteQuizletSentinels, "GET", "/sets/" + setId);
+}
+
+function deleteQuizletSentinels(response){
+  var setId = response.id.toString();
+  var terms = response.terms;
+  for(var i = 0; i<terms.length; i++){
+    if(terms[i].term === "jellySentinel!@#$%^&*()" || terms[i].term === "jellySentinel)(*&^%$#@!"){
+      deleteQuizletTerm(setId, terms[i].id);
+      break;
+    }
+  }
+}
+
+function deleteQuizletTerm(setId, termId){
+  quizletRequest(notifyDeletion, "DELETE", "/sets/" + setId + "/terms/" + termId);
+}
+
+function notifyDeletion(response){
+  notify("success", "Sentinel deleted", 1000);
 }
 
 /**
@@ -634,14 +643,20 @@ function ankiRequest(callbackFunc, action, params={}){
   });
 }
 
-function quizletRequest(callback, accessToken, method, endpoint, params={}){
-  chrome.runtime.sendMessage({
-    "purpose": "quizletRequest",
-    "callback": callback.name,
-    "access_token": accessToken,
-    "method": method,
-    "endpoint": endpoint,
-    "params": params
+function quizletRequest(callback, method, endpoint, params={}){
+  chrome.storage.sync.get("quizletAccessToken", function(response){
+    if(response.quizletAccessToken !== undefined){
+      chrome.runtime.sendMessage({
+        "purpose": "quizletRequest",
+        "callback": callback.name,
+        "access_token": response.quizletAccessToken,
+        "method": method,
+        "endpoint": endpoint,
+        "params": params
+      });
+    }else{
+      alert("You haven't set up Quizlet!");
+    }
   });
 }
 
