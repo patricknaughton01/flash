@@ -109,8 +109,11 @@ function addCard(termText, x, y, xSize, ySize, element){
     xhr.onreadystatechange = function(){
       if(this.readyState !== 4)return;
       if(this.status !== 200)return;
-      document.getElementsByClassName("jellyNewCardContainer")[0].innerHTML = this.responseText;
-      fillInCard();
+      var cardContainers = document.getElementsByClassName("jellyNewCardContainer");
+      if(cardContainers.length > 0 && cardContainers[0] !== null){
+        cardContainers[0].innerHTML = this.responseText;
+        fillInCard();
+      }
     }
     xhr.send();
   }
@@ -123,8 +126,10 @@ function addCard(termText, x, y, xSize, ySize, element){
 function fillInCard(){
   chrome.storage.sync.get("flashCardProgram", function(response){
     var newCard = document.getElementById("jellyNewCard");
+    if(newCard === null)return;
     newCard.style.backgroundRepeat = "no-repeat";
     newCard.style.backgroundSize = "cover";
+    // No need to check for existence because we know `newCard` exists
     document.getElementById("jellyLoadingIcon").src = chrome.extension.getURL("img/loading.gif");
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
@@ -276,6 +281,10 @@ function displayFields(fields){
     }
   </style>`;
   var dependentDiv = document.getElementById("jellyNewCardDependent");
+  if(dependentDiv === null){
+    console.log("Couldn't find element of id `jellyNewCardDependent`");
+    return;
+  }
   dependentDiv.style.display = "block";
   dependentDiv.innerHTML = fieldString;
   var cardFields = document.getElementsByClassName("jellyNewCardField");
@@ -311,6 +320,10 @@ function displayFields(fields){
  */
 function saveAnkiCard(){
   var fields = document.getElementsByClassName("jellyNewCardField");
+  if(fields.length <= 0){
+    console.log("No Jelly fields found.");
+    return;
+  }
   var output = {};
   for(var i = 0; i<fields.length; i++){
     if(fields[i].value === ""){
@@ -321,10 +334,20 @@ function saveAnkiCard(){
       output[fieldName.slice(newCardIdBufferLen)] = fields[i].value;
     }
   }
+  var deck = document.getElementById("jellyNewAnkiCardDeck");
+  var model = document.getElementById("jellyNewAnkiCardModel");
+  if(deck === null){
+    console.log("No deck info found at id `jellyNewAnkiCardDeck`.");
+    return;
+  }
+  if(model === null){
+    console.log("No model info found at id `jellyNewAnkiCardModel`.");
+    return;
+  }
   ankiRequest(ankiCardWrapUp, "addNote", {
     "note": {
-      "deckName": document.getElementById("jellyNewAnkiCardDeck").value,
-      "modelName": document.getElementById("jellyNewAnkiCardModel").value,
+      "deckName": deck.value,
+      "modelName": model.value,
       "fields": output,
       "tags":[
         "jelly"
@@ -699,9 +722,19 @@ function generateOptionsList(inputArr, values=[]){
  *  Save the user's last used deck and/or model
  */
 function saveAnkiCardConfig(){
-  var deck = document.getElementById("jellyNewAnkiCardDeck").value;
-  var model = document.getElementById("jellyNewAnkiCardModel").value;
-  chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model});
+  var deck = document.getElementById("jellyNewAnkiCardDeck");
+  var model = document.getElementById("jellyNewAnkiCardModel");
+  var error = false;
+  if(deck === null){
+    console.log("No Anki deck info with id `jellyNewAnkiCardDeck` to save");
+    error = true;
+  }
+  if(model === null){
+    console.log("No Anki model info with id `jellyNewAnkiCardModel` to save");
+    error = true;
+  }
+  if(error)return;
+  chrome.storage.sync.set({"ankiDeck": deck.value, "ankiModel": model.value});
 }
 
 /**
