@@ -306,7 +306,7 @@ function displayFields(fields){
         cardFields[focusIndex].focus();
       }catch(e){
         cardFields[cardFields.length-1].focus();
-        notify("warning", "Focus index " + focusIndex + " was out of range", 2000);
+        notify("warning", "Focus index " + (focusIndex + 1).toString() + " was out of range", 2000);
       }
     });
   }else{
@@ -419,12 +419,24 @@ function displayQuizletConfig(setInfo){
       </div>
     `);
 
-    document.getElementById("jellyNewQuizletSet").onclick = newQuizletSet;
+    try{
+      document.getElementById("jellyNewQuizletSet").onclick = newQuizletSet;
+    }catch(e){
+      console.log(e);
+    }
 
     var configLabel = document.getElementsByClassName("jellyNewQuizletCardConfigLabel")[0];
+    if(configLabel === null){
+      console.log("Couldn't find element with id `jellyNewQuizletCardConfigLabel` in function `displayQuizletConfig`");
+      return;
+    }
     configLabel.style.backgroundColor = "#ffffff";
     configLabel.style.margin = "5px";
     var setSelect = document.getElementById("jellyNewQuizletCardSet");
+    if(setSelect === null){
+      console.log("Couldn't find element with id `jellyNewQuizletCardSet` in function `displayQuizletConfig`");
+      return;
+    }
     setSelect.innerHTML = generateOptionsList(setNames, setIds);
     changeSelection("jellyNewQuizletCardSet", currSetId);
     setSelect.onchange = function(){
@@ -435,9 +447,18 @@ function displayQuizletConfig(setInfo){
 }
 
 function saveQuizletCard(){
-  var setId = document.getElementById("jellyNewQuizletCardSet").value.toString();
+  var set = document.getElementById("jellyNewQuizletCardSet");
+  if(set === null){
+    console.log("Couldn't find element with id `jellyNewQuizletCardSet` in function `saveQuizletCard`");
+    return;
+  }
+  var setId = set.value.toString()
   var output = {};
   var cardFields = document.getElementsByClassName("jellyNewCardField");
+  if(cardFields.length <= 0){
+    console.log("Couldn't find any cardFields in function `saveQuizletCard`");
+    return;
+  }
   for(var i = 0; i<cardFields.length; i++){
     output[cardFields[i].getAttribute("id").slice(newCardIdBufferLen).toLowerCase()] = cardFields[i].value;
   }
@@ -693,10 +714,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
       notify("error", request.error.charAt(0).toUpperCase() + request.error.slice(1), 5000);
       closeCard();
     }else{
-      window[request.callback](request.result);
+      try{
+        window[request.callback](request.result);
+      }catch(e){
+        console.log(e);
+      }
     }
   }else if(request.type === "quizletResponse"){
-    window[request.callback](request.response);
+    try{
+      window[request.callback](request.response);
+    }catch(e){
+      console.log(e);
+    }
   }
 });
 
