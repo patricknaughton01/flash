@@ -289,7 +289,7 @@ function displayFields(fields){
   dependentDiv.innerHTML = fieldString;
   var cardFields = document.getElementsByClassName("jellyNewCardField");
   if(cardFields.length > 0){
-    chrome.storage.sync.get("highlightPref", function(response){
+    chrome.storage.sync.get(["highlightPref", "focusPref"], function(response){
       var highlightIndex = response.highlightPref;
       if(highlightIndex === undefined)highlightIndex = 0;
       try{
@@ -298,21 +298,53 @@ function displayFields(fields){
         cardFields[0].innerText = highlightedText;
         notify("warning", "Highlight index" + highlightIndex + "out of range", 2000);
       }
-    });
-    chrome.storage.sync.get("focusPref", function(response){
       var focusIndex = response.focusPref;
       if(focusIndex === undefined)focusIndex = 1;
-      try{
-        cardFields[focusIndex].focus();
-      }catch(e){
-        cardFields[cardFields.length-1].focus();
+      if(focusIndex >= cardFields.length){
         notify("warning", "Focus index " + (focusIndex + 1).toString() + " was out of range", 2000);
+        focusIndex = cardFields.length - 1;
       }
+      cardFields[focusIndex].focus();
+      autoTranslate(highlightedText, cardFields[focusIndex]);
     });
   }else{
     notify("error", "No new card fields?", 3000);
     closeCard();
   }
+}
+
+function autoTranslate(text, textElement){
+  chrome.storage.sync.get(["autoTranslate","sourceLang", "targetLang"], function(response){
+    if(response.autoTranslate){
+      var sourceLang;
+      var targetLang;
+      if(response.sourceLang === undefined)sourceLang = "de";
+      else sourceLang = response.sourceLang;
+      if(response.targetLang === undefined)targetLang = "en";
+      else targetLang = response.targetLang;
+      var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + encodeURI(text);
+      fetch(url)
+        .then(
+          function(translationResponse){
+            if(translationResponse.status !== 200){
+              console.log("translation error " + translationResponse.status);
+              return;
+            }
+            translationResponse.json().then(function(data){
+              try{
+                textElement.innerText = data[0][0][0];
+              }catch(e){
+                console.log(e);
+                notify("error", "Couldn't translate.", 2000);
+              }
+            });
+          }
+        )
+        .catch(function(err){
+          console.log("Fetch error ", err);
+        })
+    }
+  });
 }
 
 /**
