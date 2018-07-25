@@ -129,8 +129,9 @@ function fillInCard(){
     if(newCard === null)return;
     newCard.style.backgroundRepeat = "no-repeat";
     newCard.style.backgroundSize = "cover";
-    // No need to check for existence because we know `newCard` exists
-    document.getElementById("jellyLoadingIcon").src = chrome.extension.getURL("img/loading.gif");
+    try{
+      document.getElementById("jellyLoadingIcon").src = chrome.extension.getURL("img/loading.gif");
+    }catch(e){console.log("No loading icon.");}
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
       case "anki":
@@ -605,8 +606,9 @@ document.onmouseup = async function(){
         }else{
           chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
             if(highlightStatus.highlightAnswer){
-              chrome.storage.sync.get("ankiFocusPref", function(response){
-                var focusIndex = response.ankiFocusPref;
+              chrome.storage.sync.get("focusPref", function(response){
+                var focusIndex = response.focusPref;
+                //TODO: Make focus index cardLength-1 if too big
                 if(focusIndex === undefined)focusIndex = 1;
                 try{
                   document.getElementsByClassName("jellyNewCardField")[focusIndex].innerText = highlightedText;
