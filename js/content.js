@@ -297,7 +297,7 @@ function displayFields(fields){
         cardFields[highlightIndex].innerText = highlightedText;
       }catch(e){
         cardFields[0].innerText = highlightedText;
-        notify("warning", "Highlight index" + highlightIndex + "out of range", 2000);
+        notify("warning", "Highlight index" + (highlightIndex + 1).toString() + "out of range", 2000);
       }
       var focusIndex = response.focusPref;
       if(focusIndex === undefined)focusIndex = 1;
@@ -607,14 +607,17 @@ document.onmouseup = async function(){
           chrome.storage.sync.get("highlightAnswer", function(highlightStatus){
             if(highlightStatus.highlightAnswer){
               chrome.storage.sync.get("focusPref", function(response){
-                var focusIndex = response.focusPref;
-                //TODO: Make focus index cardLength-1 if too big
-                if(focusIndex === undefined)focusIndex = 1;
-                try{
-                  document.getElementsByClassName("jellyNewCardField")[focusIndex].innerText = highlightedText;
-                }catch(e){
-                  notify("warning", "Focus index " + focusIndex + " was out of range", 2000);
+                var cardFields = document.getElementsByClassName("jellyNewCardField");
+                if(cardFields.length <= 0){
+                  return;
                 }
+                var focusIndex = response.focusPref;
+                if(focusIndex === undefined)focusIndex = 1;
+                if(focusIndex >= cardFields.length){
+                  notify("warning", "Focus index " + (focusIndex + 1).toString() + " was out of range", 2000);
+                  focusIndex = cardFields.length - 1;
+                }
+                cardFields[focusIndex].innerText = highlightedText;
               });
             }else{
               closeCard();
