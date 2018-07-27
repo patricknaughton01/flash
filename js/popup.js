@@ -36,8 +36,8 @@ $(function(){
   });
   chrome.storage.sync.get(null, function(result){
     changeSelection("jellyActivationKey", result.activationKey.key);
-    console.log(result.activationKey.key);
     document.getElementById("jellyHighlightAnswer").checked = result.highlightAnswer;
+    document.getElementById("jellyAutoTranslate").checked = result.autoTranslate;
     changeSelection("jellyPictureKey", result.pictureTerms.key);
     changeSelection("jellyAudioKey", result.audioTerms.key);
     changeSelection("jellyVisibilityKey", result.visibilityToggle.key);
@@ -51,6 +51,7 @@ $(function(){
 function savePopupSettings(){
   chrome.storage.sync.set({"activationKey": {"key": $("#jellyActivationKey").val()}}, function(){});
   chrome.storage.sync.set({"highlightAnswer": $("#jellyHighlightAnswer").is(":checked")}, function(){});
+  chrome.storage.sync.set({"autoTranslate": $("#jellyAutoTranslate").is(":checked")}, function(){});
   chrome.storage.sync.set({"pictureTerms": {"key": $("#jellyPictureKey").val()}}, function(){});
   chrome.storage.sync.set({"audioTerms": {"key": $("#jellyAudioKey").val()}}, function(){});
   chrome.storage.sync.set({"visibilityToggle": {"key": $("#jellyVisibilityKey").val()}}, function(){});

@@ -126,6 +126,7 @@ function loadSettings(){
       settings = {
         "activationKey": {"key": "off"},
         "highlightAnswer": true,
+        "autoTranslate": false,
         "pictureTerms": {"key": "off"},
         "audioTerms": {"key": "off"},
         "visibilityToggle": {"key": "v"}
