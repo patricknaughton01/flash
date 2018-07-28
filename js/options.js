@@ -6,6 +6,12 @@ $(function(){
   displayConfigMenu();
   $("#jellyCardProgramSelect").on("change", displayConfigMenu);
   $("#jellyAnkiConfigSubmit").on("click", configAnki);
+  $("#jellyQuizletGo").on("click", function(){
+    chrome.runtime.sendMessage({
+      "purpose": "quizletAuth",
+      "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + RANDOM_STRING
+    });
+  });
 });
 
 function configAnki(){
@@ -57,11 +63,6 @@ function displayConfigMenu(event){
       break;
     case "quizlet":
       quizletBlock.style.display = "block";
-      console.log(chrome.extension.getURL('html/options.html'));
-      chrome.runtime.sendMessage({
-        "purpose": "quizletAuth",
-        "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + RANDOM_STRING
-      });
       break;
     default:
       console.log("don't select none!");

@@ -43,7 +43,20 @@
       </div>
     </div>
     <div id="jellyQuizletConfig" class="jellyConfigBox" style="display:none;">
-      <p>I really should put something here</p>
+      <p>
+        To use Jelly with Quizlet you must give Jelly access to your account.
+      </p>
+      <p>
+        Note that if you create a new set with Jelly, the program will automatically
+        add two cards to that set called `jellySentinel!@#$%^&amp;*()` and
+        `jellySentinel)(*&amp;^%$#@!`. this is because Quizlet will not allow you
+        to create an empty set. Jelly will automatically try to delete any cards that
+        have these term fields every time you add a card to a set. Unfortunately,
+        this means that it is impossible to use Jelly with a set that contains a
+        card whose term is either of these words (but I highly doubt you will want to
+        do that)...
+      </p>
+      <button id="jellyQuizletGo">Go To Quizlet</button>
     </div>
   </body>
   <script src="../js/jquery-3.3.1.min.js"></script>
