@@ -206,24 +206,36 @@ function displayAnkiConfig(accountInfo){
     }
     chrome.storage.sync.set({"ankiDeck": deck, "ankiModel": model}, function(){});
     document.getElementById("jellyNewCardConfig").innerHTML = (`
-      <div id=\"jellyNewAnkiCardDeckBox\">
-        <label for=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfigLabel\">
+      <div id="jellyNewAnkiCardDeckBox">
+        <label for="jellyNewAnkiCardDeck" class="jellyNewAnkiCardConfigLabel">
           Deck:
         </label>
-        <select id=\"jellyNewAnkiCardDeck\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\">
+        <select id="jellyNewAnkiCardDeck" class="jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect">
         </select>
       </div>
-      <div id=\"jellyNewAnkiDeckBox\">
+      <div id="jellyNewAnkiDeckBox">
         <button id="jellyNewAnkiDeck" class="jellyNewAnkiCardConfig">
           New Deck
         </button>
       </div>
-      <div id=\"jellyNewAnkiCardModelBox\">
-        <label for=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfigLabel\">
+      <div id="jellyNewAnkiCardModelBox">
+        <label for="jellyNewAnkiCardModel" class="jellyNewAnkiCardConfigLabel">
           Model:
         </label>
-        <select id=\"jellyNewAnkiCardModel\" class=\"jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect\">
+        <select id="jellyNewAnkiCardModel" class="jellyNewAnkiCardConfig jellyNewAnkiCardConfigSelect">
         </select>
+        <style>
+          #jellyNewCard #jellyNewCardConfig .jellyNewAnkiCardConfig{
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.16, rgb(207, 207, 207)), color-stop(0.79, rgb(252, 252, 252)));
+            background-image: -moz-linear-gradient(center bottom, rgb(207, 207, 207) 16%, rgb(252, 252, 252) 79%);
+            background-image: linear-gradient(to top, rgb(207, 207, 207) 16%, rgb(252, 252, 252) 79%);
+            padding: 3px;
+            margin:5px;
+          }
+        </style>
       </div>`);
     var configLabels = document.getElementsByClassName("jellyNewAnkiCardConfigLabel");
     for (var i =0; i<configLabels.length; i++){
@@ -262,23 +274,28 @@ function displayFields(fields){
     fieldString += "</div>"
   }
   fieldString += `<style>
-    .jellyNewCardFieldBox{
-      margin:5px;
+    .cleanslate #jellyNewCardDependent .jellyNewCardFieldBox{
+      margin:5px ;
     }
-    .jellyNewCardInputBox{
-      margin: 5px;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+    .cleanslate #jellyNewCardDependent .jellyNewCardInputBox{
+      margin: 5px ;
+      display: flex ;
+      flex-direction: row ;
+      flex-wrap: wrap ;
     }
-    .jellyNewCardField{
-      width: 90%;
-      margin: auto;
-      display: block;
-      resize: none;
+    .cleanslate #jellyNewCardDependent .jellyNewCardField{
+      width: 90% ;
+      margin: auto ;
+      display: block ;
+      resize: none ;
     }
-    .jellyNewCardLabel{
-      background-color: #ffffff;
+    .cleanslate #jellyNewCardDependent .jellyNewCardLabel{
+      background-color: #ffffff ;
+    }
+    .cleanslate #jellyNewCardDependent .jellyNewCardInputBox textarea{
+      font-size:14px;
+      line-height:18px;
+      height: 2.75em;
     }
   </style>`;
   var dependentDiv = document.getElementById("jellyNewCardDependent");
@@ -441,13 +458,19 @@ function displayQuizletConfig(setInfo){
     }
     chrome.storage.sync.set({"quizletSetId": currSetId});
     document.getElementById("jellyNewCardConfig").innerHTML = (`
-      <div id=\"jellyNewQuizletCardDeckBox\">
-      <label for=\"jellyNewQuizletCardDeck\" class=\"jellyNewQuizletCardConfigLabel\">Set:
+      <div id="jellyNewQuizletCardDeckBox">
+      <label for="jellyNewQuizletCardDeck" class="jellyNewQuizletCardConfigLabel">Set:
       </label>
-      <select id=\"jellyNewQuizletCardSet\" class=\"jellyNewQuizletCardConfig jellyNewQuizletCardConfigSelect\">
+      <select id="jellyNewQuizletCardSet" class="jellyNewQuizletCardConfig jellyNewQuizletCardConfigSelect" style="-webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.16, rgb(207, 207, 207)), color-stop(0.79, rgb(252, 252, 252)));
+        background-image: -moz-linear-gradient(center bottom, rgb(207, 207, 207) 16%, rgb(252, 252, 252) 79%);
+        background-image: linear-gradient(to top, rgb(207, 207, 207) 16%, rgb(252, 252, 252) 79%);
+        padding: 3px;">
       </select>
       </div>
-      <div id="jellyNewQuizletSetBox">
+      <div id="jellyNewQuizletSetBox" style="margin:5px;">
         <button id="jellyNewQuizletSet" class="jellyNewQuizletCardConfig">New Set</button>
       </div>
     `);
