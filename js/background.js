@@ -129,7 +129,9 @@ function loadSettings(){
         "autoTranslate": false,
         "pictureTerms": {"key": "off"},
         "audioTerms": {"key": "off"},
-        "visibilityToggle": {"key": "v"}
+        "visibilityToggle": {"key": "v"},
+        "sourceLang": "de",
+        "targetLang": "en"
       };
       saveSettings();
     }else{
