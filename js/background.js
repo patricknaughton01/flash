@@ -1,4 +1,5 @@
 var settings;
+var state;
 
 loadSettings();
 
@@ -12,10 +13,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     ankiRequest(request.callback, request.address, request.action, request.version, request.params);
   }else if(request.purpose === "quizletAuth"){
     quizletAuth(request.url);
+    state = request.state;
   }else if(request.purpose === "quizletGetAccessToken"){
     quizletGetAccessToken(request.key);
   }else if(request.purpose === "quizletRequest"){
     quizletRequest(request.callback, request.access_token, request.method, request.endpoint, request.params);
+  }else if(request.purpose === "quizletState"){
+    sendResponse(state);
   }else if(request.purpose === "createTab"){
     try{
       chrome.tabs.create({"url": request.url});

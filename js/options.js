@@ -1,5 +1,3 @@
-var RANDOM_STRING = "pQDVvFncGKMIQjNlYEx";
-
 
 $(function(){
   $("#jellyCardProgramSelect").chosen({
@@ -9,9 +7,11 @@ $(function(){
   $("#jellyCardProgramSelect").on("change", displayConfigMenu);
   $("#jellyAnkiConfigSubmit").on("click", configAnki);
   $("#jellyQuizletGo").on("click", function(){
+    var state = makeRandom(100);
     chrome.runtime.sendMessage({
       "purpose": "quizletAuth",
-      "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + RANDOM_STRING
+      "state": state,
+      "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + state
     });
   });
 });
@@ -69,4 +69,13 @@ function displayConfigMenu(event){
     default:
       console.log("don't select none!");
   }
+}
+
+function makeRandom(len){
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var arr = [];
+  for(var i = 0; i < len; i++){
+    arr.push(possible.charAt(Math.floor(Math.random() * possible.length)));
+  }
+  return(arr.join(""));
 }
