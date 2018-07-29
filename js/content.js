@@ -448,6 +448,7 @@ function displayQuizletConfig(setInfo){
   }
   if(sets.length <= 0){
     alert("You don't have any Quizlet sets! Make a set before using Jelly!");
+    newQuizletSet();
     closeCard();
     return;
   }
