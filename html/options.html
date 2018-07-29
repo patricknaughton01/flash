@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+</html>
+  <head>
+    <link rel="stylesheet" href="../js/chosen/chosen.css"/>
+    <link rel="stylesheet" href="../css/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/options.css"/>
+  </head>
+  <body>
+    <h1>Jelly</h1>
+    <div id="jellyCardProgramSelectBox">
+      <select id="jellyCardProgramSelect">
+        <option value="none">None</option>
+        <option value="anki">Anki</option>
+        <option value="quizlet">Quizlet</option>
+      </select>
+    </div>
+    <div id="jellyAnkiConfig" class="jellyConfigBox" style="display:none;">
+      <p class="jellyConfigInfo">
+        Make sure you install and set up <a class="jellyLink" href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a>! Otherwise you won't be able to save flash cards!
+      </p>
+      <div id="jellyAnkiConfigVersionBox" class="jellyAnkiConfigBox">
+        <label for="jellyAnkiConfigVersion" id="jellyAnkiConfigVersionLabel" class="jellyAnkiConfigLabel">Version: </label>
+        <input id="jellyAnkiConfigVersion" class="jellyAnkiConfigInput" type="number" />
+      </div>
+      <div id="jellyAnkiConfigVersionHelp" class="jellyConfigHelp">
+        <p>Remeber, this is the version of AnkiConnect, not Anki! As such, it should be a number from 1-6.</p>
+      </div>
+      <div id="jellyAnkiConfigVersionError" class="jellyConfigError">
+        <p>Your version has to be from 1-6! (inclusive)</p>
+      </div>
+      <div id="jellyAnkiConfigAddressBox" class="jellyAnkiConfigBox">
+        <label for="jellyAnkiConfigAddress" class="jellyAnkiConfigAddressLabel">Bind Address:</label>
+        <input id="jellyAnkiConfigAddress" class="jellyAnkiConfigInput" type="text"/>
+      </div>
+      <div id="jellyAnkiConfigAddressHelp" class="jellyConfigHelp">
+        <p>If you don't know this, leave it blank. You will only be able to add cards from your computer. See <a class="jellyLink" href="https://foosoft.net/projects/anki-connect/#application-interface-for-developers">AnkiConnect's</a> website for more details.</p>
+      </div>
+      <div id="jellyAnkiConfigAddressError" class="jellyConfigError">
+        <p>Your address has to be an IPv4 address like "192.168.1.0" or "127.0.0.1"!</p>
+      </div>
+      <div id="jellyAnkiSubmitButtonBox" class="jellyAnkiConfigBox">
+        <input type="button" value="Save" class="jellyAnkiConfigInput" id="jellyAnkiConfigSubmit"/>
+      </div>
+    </div>
+    <div id="jellyQuizletConfig" class="jellyConfigBox" style="display:none;">
+      <p>
+        To use Jelly with Quizlet you must give Jelly access to your account.
+      </p>
+      <p>
+        Note that if you create a new set with Jelly, the program will automatically
+        add two cards to that set called `jellySentinel!@#$%^&amp;*()` and
+        `jellySentinel)(*&amp;^%$#@!`. this is because Quizlet will not allow you
+        to create an empty set. Jelly will automatically try to delete any cards that
+        have these term fields every time you add a card to a set. Unfortunately,
+        this means that it is impossible to use Jelly with a set that contains a
+        card whose term is either of these words (but I highly doubt you will want to
+        do that)...
+      </p>
+      <button id="jellyQuizletGo">Go To Quizlet</button>
+    </div>
+  </body>
+  <script src="../js/jquery-3.3.1.min.js"></script>
+  <script src="../js/chosen/chosen.jquery.min.js"></script>
+  <script src="../js/options.js"></script>
+</html>
