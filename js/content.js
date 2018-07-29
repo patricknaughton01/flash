@@ -7,6 +7,8 @@ var ankiVersion = "";
 var ctrlDown = false;
 var altDown = false;
 var newCardIdBufferLen = 17;
+var cardFollowMouse = false;
+var offset = [0, 0];
 
 var keyCallbacks = {
   "activationKey": {"callbackDown": "", "callbackUp": "activateIcon"},
@@ -594,13 +596,14 @@ function closeCard(){
  * Create image popup when user highlights text
  */
 document.onmouseup = async function(){
+  cardFollowMouse = false;
   var x = event.pageX;
   var y = event.pageY;
   highlightPos = [x, y];
 
   var clickedElement = event.target;
   var clickedIcon = elementClassContainsClick(["jellyIcon"], clickedElement);
-  var clickedCard = elementClassContainsClick(["jellyNewCard"], clickedElement);
+  var clickedCard = elementClassContainsClick(["jellyNewCardContainer"], clickedElement);
   if(clickedIcon != null){
     var cardLeftStart = parseInt(clickedIcon.style.left);
     var cardTopStart = parseInt(clickedIcon.style.top);
@@ -661,6 +664,29 @@ document.onmouseup = async function(){
   }
 
 
+}
+
+document.onmousedown = function(){
+  var target = event.target;
+  var pos = [event.pageX, event.pageY];
+  var clickedCard = elementClassContainsClick(["jellyNewCardContainer"], target);
+  if(clickedCard !== null){
+    cardFollowMouse = true;
+    offset = [pos[0] - parseInt(clickedCard.style.left), pos[1] - parseInt(clickedCard.style.top)];
+  }else{
+    cardFollowMouse = false;
+  }
+}
+
+document.onmousemove = function(){
+  var pos = [event.pageX, event.pageY];
+  var card = document.getElementsByClassName("jellyNewCardContainer");
+  if(card.length <= 0)return;
+  else card = card[0];
+  if(cardFollowMouse){
+    card.style.left = (pos[0] - offset[0]).toString() + "px";
+    card.style.top = (pos[1] - offset[1]).toString() + "px";
+  }
 }
 
 /**
