@@ -2,7 +2,9 @@ var RANDOM_STRING = "pQDVvFncGKMIQjNlYEx";
 
 
 $(function(){
-  $("#jellyCardProgramSelect").chosen();
+  $("#jellyCardProgramSelect").chosen({
+    width: "100px"
+  });
   displayConfigMenu();
   $("#jellyCardProgramSelect").on("change", displayConfigMenu);
   $("#jellyAnkiConfigSubmit").on("click", configAnki);
