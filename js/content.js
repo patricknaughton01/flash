@@ -947,7 +947,7 @@ function notify(type, message, timeout){
     </style>`;
   notificationContainer.innerHTML = notificationString;
   document.getElementById("jellyNotificationIcon").src = chrome.extension.getURL("img/icon.png");
-  //setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
+  setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
 }
 
 function destroyNotification(notification){
