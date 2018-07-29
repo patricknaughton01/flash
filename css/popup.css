@@ -1,5 +1,5 @@
 body{
-  min-width: 150px;
+  min-width: 230px;
 }
 
 #jellySettings{
@@ -24,4 +24,8 @@ body{
 
 .jellySelect{
   max-height:20px;
+}
+
+.jellySelectLang{
+  max-width: 100px;
 }
