@@ -185,6 +185,7 @@ function displayAnkiConfig(accountInfo){
   var modelNames = accountInfo[1];
   if(deckNames.length <= 0){
     alert("You don't have any Anki decks! Make a deck before using Jelly!");
+    newAnkiDeck();
     closeCard();
     return;
   }
