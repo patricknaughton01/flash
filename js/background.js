@@ -108,7 +108,7 @@ function quizletGetAccessToken(key){
       alert("Your access token was successfully set! (even if the background says 'Cannot continue')");
     });
   }
-  xhr.setRequestHeader('Authorization', "Basic " + "SHQ0Tkgya3RYdjo2OVRIU0NNckMzeUdiVFNLeXZLeDhi");
+  xhr.setRequestHeader('Authorization', "Basic SHQ0Tkgya3RYdjo2OVRIU0NNckMzeUdiVFNLeXZLeDhi");
   xhr.setRequestHeader('Content-Type', "application/x-www-form-urlencoded; charset=UTF-8");
   xhr.send(JSON.stringify({
     "grant_type": "authorization_code",
