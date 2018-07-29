@@ -799,7 +799,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   if(request.type === "ankiResponse"){
     if(request.error !== null){
       console.log(request.error);
-      notify("error", request.error.charAt(0).toUpperCase() + request.error.slice(1), 5000);
+      alert(request.error.charAt(0).toUpperCase() + request.error.slice(1));
       closeCard();
     }else{
       try{
@@ -909,7 +909,8 @@ function notify(type, message, timeout){
   notificationContainer.style.zIndex = 1000000;
   document.getElementsByTagName("body")[0].appendChild(notificationContainer);
   var notificationString = `<div class="jellyNotification">
-    <p class="jellyNotificationText">`;
+      <img src="" id="jellyNotificationIcon"/>
+      <p class="jellyNotificationText">`;
   notificationString += message;
   notificationString += `</p>
     </div>
@@ -920,9 +921,10 @@ function notify(type, message, timeout){
         height:50px;
         border: 4px solid rgba(32, 32, 32, 0.5);
         display: flex;
-        flex-flow: row, wrap;
+        flex-direction: row;
         overflow: hidden;
         flex-wrap:no-wrap;
+        align-items: center;
       }
       .jellyNotificationContainer:hover{
         opacity: 0.2;
@@ -935,9 +937,17 @@ function notify(type, message, timeout){
         font-size: 0.75em;
         whitespace: nowrap;
       }
+      #jellyNotificationIcon{
+        width: 18px;
+        height: 18px;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 15px;
+      }
     </style>`;
   notificationContainer.innerHTML = notificationString;
-  setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
+  document.getElementById("jellyNotificationIcon").src = chrome.extension.getURL("img/icon.png");
+  //setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
 }
 
 function destroyNotification(notification){
