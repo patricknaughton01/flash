@@ -180,6 +180,11 @@ $(function(){
     <option value="zu">Zulu</option>
   `;
   $(".jellySelectLang").html($langOpts);
+  var autoOption = document.createElement("OPTION");
+  autoOption.setAttribute("value", "auto");
+  autoOption.appendChild(document.createTextNode("Auto"));
+  var sourceLangElem = document.getElementById("jellySourceLang");
+  sourceLangElem.insertBefore(autoOption, sourceLangElem.firstChild);
   $(".jellySetting").on("change", function(event){
     savePopupSettings();
   });
