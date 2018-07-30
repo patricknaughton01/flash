@@ -186,6 +186,7 @@ $(function(){
   var sourceLangElem = document.getElementById("jellySourceLang");
   sourceLangElem.insertBefore(autoOption, sourceLangElem.firstChild);
   $(".jellySetting").on("change", function(event){
+    console.log("change");
     savePopupSettings();
   });
   $("#jellySettingsButton").on("click", function(){
@@ -200,6 +201,8 @@ $(function(){
     changeSelection("jellyVisibilityKey", result.visibilityToggle.key);
     changeSelection("jellySourceLang", result.sourceLang);
     changeSelection("jellyTargetLang", result.targetLang);
+    document.getElementById("jellyHighlightIndex").value = result.highlightPref + 1;
+    document.getElementById("jellyFocusIndex").value = result.focusPref + 1;
     changeSelection("jellyCardProgram", result.flashCardProgram);
   });
 });
@@ -216,6 +219,8 @@ function savePopupSettings(){
   chrome.storage.sync.set({"visibilityToggle": {"key": $("#jellyVisibilityKey").val()}}, function(){});
   chrome.storage.sync.set({"sourceLang": $("#jellySourceLang").val()}, function(){});
   chrome.storage.sync.set({"targetLang": $("#jellyTargetLang").val()}, function(){});
+  chrome.storage.sync.set({"highlightPref": $("#jellyHighlightIndex").val() - 1}, function(){});
+  chrome.storage.sync.set({"focusPref": $("#jellyFocusIndex").val() - 1}, function(){});
   chrome.storage.sync.set({"flashCardProgram": $("#jellyCardProgram").val()}, function(){});
 }
 

@@ -317,7 +317,7 @@ function displayFields(fields){
         cardFields[highlightIndex].innerText = highlightedText;
       }catch(e){
         cardFields[0].innerText = highlightedText;
-        notify("warning", "Highlight index" + (highlightIndex + 1).toString() + "out of range", 2000);
+        notify("warning", "Highlight index " + (highlightIndex + 1).toString() + " out of range", 2000);
       }
       var focusIndex = response.focusPref;
       if(focusIndex === undefined)focusIndex = 1;

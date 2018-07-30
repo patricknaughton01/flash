@@ -29,3 +29,8 @@ body{
 .jellySelectLang{
   max-width: 100px;
 }
+
+.jellyInt{
+  max-width:30px;
+  max-height: 13px;
+}
