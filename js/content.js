@@ -609,11 +609,16 @@ document.onmouseup = async function(){
   if(clickedIcon != null){
     var cardLeftStart = parseInt(clickedIcon.style.left);
     var cardTopStart = parseInt(clickedIcon.style.top);
+    var iconWidth = clickedIcon.offsetWidth;
+    //Put card on other side of icon if too close to right border (card is maximally 300px wide).
+    if(document.documentElement.clientWidth - event.clientX < 300 + iconWidth){
+      iconWidth = -300 - iconWidth;
+    }
     addCard(
       highlightedText,
       cardLeftStart,
       cardTopStart,
-      clickedIcon.offsetWidth,
+      iconWidth,
       clickedIcon.offsetHeight,
       clickedIcon
     );
