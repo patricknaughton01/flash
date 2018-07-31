@@ -7,9 +7,7 @@ loadSettings();
  * Respond with requested settings
  */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-  if(request.purpose == "settings"){
-    sendSettings(request.key);
-  }else if(request.purpose === "ankiRequest"){
+  if(request.purpose === "ankiRequest"){
     ankiRequest(request.callback, request.address, request.action, request.version, request.params);
   }else if(request.purpose === "quizletAuth"){
     quizletAuth(request.url);
@@ -146,18 +144,4 @@ function loadSettings(){
       });
     }
   });
-}
-
-function sendSettings(key){
-  chrome.storage.sync.get(null, function(result){
-    settings = result;
-  });
-  chrome.tabs.query({"active": true, "currentWindow": true}, function(tabs){
-    var activeTab = tabs[0];
-    if (key == null){
-      chrome.tabs.sendMessage(activeTab.id, settings);
-    }else{
-      chrome.tabs.sendMessage(activeTab.id, settings.key);
-    }
-  })
 }
