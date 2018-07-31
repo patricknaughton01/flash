@@ -135,7 +135,9 @@ function loadSettings(){
         "audioTerms": {"key": "off"},
         "visibilityToggle": {"key": "v"},
         "sourceLang": "de",
-        "targetLang": "en"
+        "targetLang": "en",
+        "highlightPref": 0,
+        "focusPref": 1
       };
       saveSettings();
     }else{
