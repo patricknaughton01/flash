@@ -14,6 +14,7 @@ $(function(){
       "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + state
     });
   });
+  toc("toc-list");
 });
 
 function configAnki(){
@@ -69,6 +70,10 @@ function displayConfigMenu(event){
     default:
       console.log("don't select none!");
   }
+}
+
+function toc(listId){
+  var contents = document.getElementById("jellyContent");
 }
 
 function makeRandom(len){
