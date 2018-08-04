@@ -73,7 +73,27 @@ function displayConfigMenu(event){
 }
 
 function toc(listId){
-  var contents = document.getElementById("jellyContent");
+  var list = document.getElementById("toc-list");
+  var contents = document.getElementById("jellyContent").innerHTML.toString();
+  var matches = contents.match(/<h(\d).*?id=\"(.*?)\">.*?<\/h\d>/g);
+  var tabPx = 10;
+  for(var i = 0; i < matches.length; i++){
+    var number = parseInt(matches[i].match(/<h(\d).*?>/)[1]);
+    var id = matches[i].match(/id=\"(.*?)\"/)[1];
+    var title = matches[i].match(/<h\d.*?>(.*?)<\/h\d>/)[1];
+    var tabWidth = (number - 1) * tabPx;
+    var listElem = document.createElement("LI");
+    var linkElem = document.createElement("A");
+    linkElem.href = "#" + id;
+    var textElem = document.createTextNode(title);
+    var fontSize = 20 - 2*number;
+    linkElem.appendChild(textElem);
+    linkElem.style.fontSize = fontSize.toString() + "px";
+    listElem.appendChild(linkElem);
+    listElem.style.paddingLeft = tabWidth.toString() + "px";
+    listElem.style.listStyleType = "none";
+    list.appendChild(listElem);
+  }
 }
 
 function makeRandom(len){

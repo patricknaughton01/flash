@@ -24,11 +24,21 @@ body{
 }
 
 #toc{
-  width: 15vw;
+  width: 175px;
   align-self: flex-start;
   height: auto;
   top:30px;
   position: sticky;
+  overflow-y: scroll;
+  max-height: 100vh;
+}
+
+#toc-list{
+  padding-left: 5px;
+}
+
+#title{
+  margin-top: 20px;
 }
 
 h2{
