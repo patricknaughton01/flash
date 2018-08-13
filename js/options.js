@@ -13,6 +13,7 @@ $(function(){
       "state": state,
       "url": "https://quizlet.com/authorize?response_type=code&client_id=Ht4NH2ktXv&scope=read write_set&state=" + state
     });
+    chrome.storage.sync.set({"flashCardProgram": "quizlet"});
   });
   toc("toc-list");
 });
@@ -43,7 +44,7 @@ function configAnki(){
     chrome.storage.sync.set({"flashCardProgram": "anki"});
     chrome.storage.sync.set({"ankiVersion": version});
     chrome.storage.sync.set({"ankiAddress": address});
-    alert("Your settings have been saved. You can view them at any time by clicking the \"Configure Card Programs\" button in this extensions popup. You can continue perusing your settings at your leisure.");
+    alert("Your settings have been saved. You can view them at any time by clicking the \"Configure Jelly\" button in this extension's popup.");
   }
 }
 

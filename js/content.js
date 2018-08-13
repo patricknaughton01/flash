@@ -172,7 +172,11 @@ function fillInCard(){
         });
         break;
       default:
-        chrome.tabs.create({"url": "/html/options.html"});
+        alert("You don't have any flash card program set up.");
+        chrome.runtime.sendMessage({
+          "purpose": "createTab",
+          "url": chrome.runtime.getURL("../html/options.html")
+        });
     }
   });
 }
