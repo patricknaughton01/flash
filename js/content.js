@@ -9,6 +9,7 @@ var altDown = false;
 var newCardIdBufferLen = 17;
 var cardFollowMouse = false;
 var offset = [0, 0];
+var maxInt = 2147483647; // Max size of an integer. Should always be on top.
 
 var keyCallbacks = {
   "activationKey": {"callbackDown": "", "callbackUp": "activateIcon"},
@@ -104,7 +105,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     y += yOffset;
     container.style.left = x.toString() + "px";
     container.style.top = y.toString() + "px";
-    container.style.zIndex = 1000000;
+    container.style.zIndex = 2147483647;
     document.getElementsByTagName("body")[0].appendChild(container);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', chrome.runtime.getURL('html/card-template.html'));
@@ -719,7 +720,6 @@ function makeIcon(x, y){
   icon.style.left = x.toString() + "px";
   icon.style.top = y.toString() + "px";
   icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
-  icon.style.zIndex = 2147483647 // Max size of an integer. Should always be on top.
   document.getElementsByTagName("body")[0].appendChild(icon);
 }
 
@@ -957,7 +957,7 @@ function notify(type, message, timeout){
     </style>`;
   notificationContainer.innerHTML = notificationString;
   document.getElementById("jellyNotificationIcon").src = chrome.extension.getURL("img/icon.png");
-  setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
+  //setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
 }
 
 function destroyNotification(notification){
