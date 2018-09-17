@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Jelly",
-  "version": "0.3",
+  "version": "0.4",
   "description": "A Chrome extension to automatically create flashcards",
   "background":{
     "scripts":["js/jquery-3.3.1.min.js", "js/background.js"]
