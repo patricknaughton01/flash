@@ -105,7 +105,7 @@ function addCard(termText, x, y, xSize, ySize, element){
     y += yOffset;
     container.style.left = x.toString() + "px";
     container.style.top = y.toString() + "px";
-    container.style.zIndex = 2147483647;
+    container.style.zIndex = maxInt;
     document.getElementsByTagName("body")[0].appendChild(container);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', chrome.runtime.getURL('html/card-template.html'));
@@ -719,7 +719,8 @@ function makeIcon(x, y){
   icon.style.height = ySize.toString() + "px";
   icon.style.left = x.toString() + "px";
   icon.style.top = y.toString() + "px";
-  icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
+  icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";4
+  icon.style.zIndex = maxInt;
   document.getElementsByTagName("body")[0].appendChild(icon);
 }
 
@@ -916,7 +917,7 @@ function notify(type, message, timeout){
     default:
   }
   notificationContainer.style.backgroundColor = color;
-  notificationContainer.style.zIndex = 1000000;
+  notificationContainer.style.zIndex = maxInt;
   document.getElementsByTagName("body")[0].appendChild(notificationContainer);
   var notificationString = `<div class="jellyNotification">
       <img src="" id="jellyNotificationIcon"/>
