@@ -719,6 +719,7 @@ function makeIcon(x, y){
   icon.style.left = x.toString() + "px";
   icon.style.top = y.toString() + "px";
   icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";
+  icon.style.zIndex = 2147483647 // Max size of an integer. Should always be on top.
   document.getElementsByTagName("body")[0].appendChild(icon);
 }
 
