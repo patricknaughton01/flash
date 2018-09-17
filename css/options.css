@@ -11,6 +11,7 @@ body{
 }
 
 #jellyContent{
+  min-width: 350px;
   max-width: 45vw;
   display: block;
 }
@@ -19,8 +20,11 @@ body{
   position: sticky;
   top: 30px;
   width: 20vw;
+  min-width: 200px;
   align-self: flex-start;
-  height: auto;
+  min-height: 50vh;
+  max-height: 100vh;
+  overflow-y: scroll;
 }
 
 #toc{
