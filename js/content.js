@@ -385,13 +385,8 @@ function saveAnkiCard(){
   }
   var output = {};
   for(var i = 0; i<fields.length; i++){
-    if(fields[i].value === ""){
-      alert("You must fill out all fields!");
-      return;
-    }else{
-      var fieldName = fields[i].getAttribute("id");
-      output[fieldName.slice(newCardIdBufferLen)] = fields[i].value;
-    }
+    var fieldName = fields[i].getAttribute("id");
+    output[fieldName.slice(newCardIdBufferLen)] = fields[i].value;
   }
   var deck = document.getElementById("jellyNewAnkiCardDeck");
   var model = document.getElementById("jellyNewAnkiCardModel");
