@@ -133,7 +133,7 @@ function fillInCard(){
     newCard.style.backgroundRepeat = "no-repeat";
     newCard.style.backgroundSize = "cover";
     try{
-      document.getElementById("jellyLoadingIcon").src = chrome.extension.getURL("img/loading.gif");
+      document.getElementById("jellyLoadingIcon").src = chrome.runtime.getURL("img/loading.gif");
     }catch(e){console.log("No loading icon.");}
     // Fill in different fields based on the chosen flash card program
     switch(response["flashCardProgram"]){
@@ -186,6 +186,7 @@ function fillInCard(){
  * Display Anki Config info based on the user's anki account info
  */
 function displayAnkiConfig(accountInfo){
+  console.log(accountInfo)
   var deckNames = accountInfo[0];
   var modelNames = accountInfo[1];
   if(deckNames.length <= 0){
@@ -719,7 +720,7 @@ function makeIcon(x, y){
   icon.style.height = ySize.toString() + "px";
   icon.style.left = x.toString() + "px";
   icon.style.top = y.toString() + "px";
-  icon.innerHTML = "<img src='" + chrome.extension.getURL('img/icon.png') + "' />";4
+  icon.innerHTML = "<img src='" + chrome.runtime.getURL('img/icon.png') + "' />";4
   icon.style.zIndex = maxInt;
   document.getElementsByTagName("body")[0].appendChild(icon);
 }
@@ -808,7 +809,7 @@ function quizletRequest(callback, method, endpoint, params={}){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
   if(request.type === "ankiResponse"){
-    if(request.error !== null){
+    if(request.error !== null && request.error !== undefined){
       console.log(request.error);
       alert(request.error.charAt(0).toUpperCase() + request.error.slice(1));
       closeCard();
@@ -957,7 +958,7 @@ function notify(type, message, timeout){
       }
     </style>`;
   notificationContainer.innerHTML = notificationString;
-  document.getElementById("jellyNotificationIcon").src = chrome.extension.getURL("img/icon.png");
+  document.getElementById("jellyNotificationIcon").src = chrome.runtime.getURL("img/icon.png");
   setTimeout(function(){destroyNotification(notificationContainer);}, timeout);
 }
 

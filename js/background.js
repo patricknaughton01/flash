@@ -28,21 +28,31 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 /**
  *  Make a request to the anki api
  */
-function ankiRequest(callback, address, action, version, params={}){
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST',"http://" + address.toString() + ":8765");
-  xhr.onreadystatechange = function(){
-    if(this.readyState !== 4)return;
-    if(this.status !== 200)return;
-    var response = JSON.parse(this.responseText);
-    response.callback = callback;
-    sendAnkiResponse(response);
+async function ankiRequest(callback, address, action, version, params={}){
+  try{
+    const response = await fetch("http://" + address.toString() + ":8765", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({action, "version":version, params})
+    });
+    if(!response.ok){
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    var data = await response.json();
+    data.callback = callback;
+    console.log(data);
+    sendAnkiResponse(data);
+  }catch(e){
+    console.log(e);
+    var data = {
+      "callback": null,
+      "result": null,
+      "error": "Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?: " + e
+    };
+    sendAnkiResponse(data)
   }
-  xhr.addEventListener("error", function(error){
-    console.log(error);
-    alert("Couldn't connect to Anki. Is your address correct? Is Anki running? Do you have AnkiConnect installed?");
-  });
-  xhr.send(JSON.stringify({action, "version":version, params}));
 }
 
 function sendAnkiResponse(response){
