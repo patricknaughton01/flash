@@ -42,7 +42,6 @@
   ],
   "permissions": [
     "storage",
-    "identity",
     "tabs",
     "favicon"
   ]
