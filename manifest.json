@@ -42,7 +42,6 @@
   ],
   "permissions": [
     "storage",
-    "tabs",
-    "favicon"
+    "tabs"
   ]
 }
